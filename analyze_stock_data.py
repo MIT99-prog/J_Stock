@@ -1,61 +1,81 @@
 #
-import joblib
 import pandas as pd
+from serialize import Data
 from get_stock_data import Element
 
-# elt = Element('', pd.DataFrame())
-open_price = pd.DataFrame()
-close_price = pd.DataFrame()
 
-filename = "./pydata"
-with open(filename, "rb") as f:
-    stocks = joblib.load(f)
+class Ranking:
+    def __init__(self):
+        self.stocks = []
+        self.open_price = pd.DataFrame()
+        self.close_price = pd.DataFrame()
+        self.data = Data()
 
-for i in range(len(stocks)):
-    elt = stocks[i]
+        self.data_read()
+        self.generate_ranking()
 
-    open_price.insert(loc=i, column=elt.company, value=elt.get_open())
-    close_price.insert(loc=i, column=elt.company, value=elt.get_close())
+    def data_read(self):
+        filename = "stock"
 
-# open_frame = pd.DataFrame(open_price).T  # DataFrame化
-# open_frame.columns = stocks  # カラム名の設定
-open_frame = open_price.ffill()  # 欠損データの補完
+        self.stocks = self.data.load_data(filename)
 
-# close_frame = pd.DataFrame(close_price).T  # DataFrame化
-# close_frame.columns = stocks  # カラム名の設定
-close_frame = close_price.ffill()  # 欠損データの補完
-print(" *** open *** ")
-print(open_frame)
-print(" *** close *** ")
-print(close_frame)
+        for i in range(len(self.stocks)):
+            elt = self.stocks[i]
 
-balance = close_frame - open_frame
-print(" *** balance *** ")
-print(balance)
+            self.open_price.insert(loc=i, column=elt.company, value=elt.get_open())
+            self.close_price.insert(loc=i, column=elt.company, value=elt.get_close())
 
-mu = balance.mean()
-mu_mean = mu.mean()
-mu_std = mu.std()
-mu_point = (mu - mu_mean) / mu_std
+    def generate_ranking(self):
+        # open_frame = pd.DataFrame(open_price).T  # DataFrame化
+        # open_frame.columns = stocks  # カラム名の設定
+        open_frame = self.open_price.ffill()  # 欠損データの補完
 
-print(" *** mu *** ")
-print(mu)
-print(mu_mean, mu_std)
+        # close_frame = pd.DataFrame(close_price).T  # DataFrame化
+        # close_frame.columns = stocks  # カラム名の設定
+        close_frame = self.close_price.ffill()  # 欠損データの補完
+        print(" *** open *** ")
+        print(open_frame)
+        print(" *** close *** ")
+        print(close_frame)
 
-sigma2 = balance.var()
-sigma2_mean = sigma2.mean()
-sigma2_std = sigma2.std()
+        # Calc Balance from Open Price to Close price
+        balance = close_frame - open_frame
+        print(" *** balance *** ")
+        print(balance)
 
-sigma2_point = (sigma2 - sigma2_mean) / sigma2_std
-print(" *** sigma2 *** ")
-print(sigma2)
-print(sigma2_mean, sigma2_std)
+        # Calc average of the balance
+        mu = balance.mean()
+        mu_mean = mu.mean()
+        mu_std = mu.std()
+        mu_point = (mu - mu_mean) / mu_std
 
-print(" *** point *** ")
-print(mu_point)
-print(sigma2_point)
+        print(" *** mu *** ")
+        print(mu)
+        print(mu_mean, mu_std)
 
-point = mu_point + sigma2_point * -1
-point = point.sort_values(ascending=False)
-print("Ranking")
-print(point)
+        # Calc variance of the balance
+        sigma2 = balance.var()
+        sigma2_mean = sigma2.mean()
+        sigma2_std = sigma2.std()
+        sigma2_point = (sigma2 - sigma2_mean) / sigma2_std
+
+        print(" *** sigma2 *** ")
+        print(sigma2)
+        print(sigma2_mean, sigma2_std)
+
+        print(" *** point *** ")
+        print(mu_point)
+        print(sigma2_point)
+
+        point = mu_point + sigma2_point * -1
+        point = point.sort_values(ascending=False)
+
+        filename = "rank"
+        self.data.save_data(filename, point)
+
+        print("Ranking")
+        print(point)
+
+
+if __name__ == '__main__':
+    Ranking()

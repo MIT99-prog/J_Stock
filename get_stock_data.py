@@ -2,6 +2,7 @@ import pandas as pd
 import yfinance as yf
 import joblib
 from element import Element
+from serialize import Data
 
 
 class Stocks:
@@ -35,12 +36,8 @@ class Stocks:
 
         # self.stocks = yf.download(self.tickers, period="1mo")
 
-        filename = "./pydata"
-
-        with open(filename, "wb") as f:
-            joblib.dump(self.stocks, f, compress=3)
-
-        print("save stocks data!")
+        data_save = Data()  # Create Data class of serialize.py
+        data_save.save_data('stock', self.stocks)  # Save data to stock file
 
 
 if __name__ == '__main__':
