@@ -1,7 +1,7 @@
 #
 import pandas as pd
+from stocks import StocksRead
 from serialize import Data
-from get_stock_data import Stock_Element
 
 
 class Ranking:
@@ -11,35 +11,14 @@ class Ranking:
         self.close_price = pd.DataFrame()
         self.data = Data()
 
-        self.data_read()
         self.generate_ranking()
 
-    def data_read(self):
-        filename = "stock"
-
-        self.stocks = self.data.load_data(filename)
-
-        for i in range(len(self.stocks)):
-            elt = self.stocks[i]
-
-            self.open_price.insert(loc=i, column=elt.company, value=elt.get_open())
-            self.close_price.insert(loc=i, column=elt.company, value=elt.get_close())
-
     def generate_ranking(self):
-        # open_frame = pd.DataFrame(open_price).T  # DataFrame化
-        # open_frame.columns = stocks  # カラム名の設定
-        open_frame = self.open_price.ffill()  # 欠損データの補完
-
-        # close_frame = pd.DataFrame(close_price).T  # DataFrame化
-        # close_frame.columns = stocks  # カラム名の設定
-        close_frame = self.close_price.ffill()  # 欠損データの補完
-        print(" *** open *** ")
-        print(open_frame)
-        print(" *** close *** ")
-        print(close_frame)
+        # Get Stocks data
+        self.stocks = StocksRead()
 
         # Calc Balance from Open Price to Close price
-        balance = close_frame - open_frame
+        balance = self.stocks.close_price - self.stocks.open_price
         print(" *** balance *** ")
         print(balance)
 
