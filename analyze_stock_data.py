@@ -1,7 +1,7 @@
 #
 import pandas as pd
 from serialize import Data
-from get_stock_data import Element
+from get_stock_data import Stock_Element
 
 
 class Ranking:
