@@ -2,7 +2,7 @@
 import pandas as pd
 import yfinance as yf
 
-from stocks import Stocks_Write
+from income_statement import Incomes_Write
 
 
 class Jasdaq:
@@ -20,5 +20,5 @@ if __name__ == '__main__':
     jasdaq = Jasdaq()
 
     # Get stock collection data and save stock file
-    st = Stocks_Write()
-    st.get_stocks(jasdaq)
+    iw = Incomes_Write()
+    iw.get_incomes(jasdaq)

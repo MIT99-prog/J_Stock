@@ -1,6 +1,6 @@
 #
 import pandas as pd
-from stocks import StocksRead
+from stocks import Stocks_Read
 from serialize import Data
 
 
@@ -15,7 +15,7 @@ class Ranking:
 
     def generate_ranking(self):
         # Get Stocks data
-        self.stocks = StocksRead()
+        self.stocks = Stocks_Read()
 
         # Calc Balance from Open Price to Close price
         balance = self.stocks.close_price - self.stocks.open_price

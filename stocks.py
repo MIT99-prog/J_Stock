@@ -9,7 +9,7 @@ class Stocks:
         self.stocks = []
 
 
-class StocksWrite(Stocks):
+class Stocks_Write(Stocks):
 
     def __init__(self):
         super().__init__()
@@ -28,7 +28,7 @@ class StocksWrite(Stocks):
         data.save_data('stock', self.stocks)  # Save data to stock file
 
 
-class StocksRead(Stocks):
+class Stocks_Read(Stocks):
     def __init__(self):
         super().__init__()
 
