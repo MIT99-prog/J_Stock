@@ -1,6 +1,6 @@
 #
 import pandas as pd
-from numpy.distutils.fcompiler import none
+import numpy as np
 from element import Income_Element
 from income_statement import Incomes_Read
 from serialize import Data
@@ -52,9 +52,43 @@ class Analysis_Income:
         ax.legend()
         plt.show()
 
+    def Ranking(self):
+        profit_ratios_1 = self.income_collection.operating_incomes / self.income_collection.total_revenues * 100
+        profit_ratios_2 = self.income_collection.net_incomes / self.income_collection.total_revenues * 100
+        average_pr1 = profit_ratios_1.mean(numeric_only=True)
+        average_pr2 = profit_ratios_2.mean(numeric_only=True)
+        average_pr = pd.DataFrame()
+        average_pr.insert(0, 'By Operating Income', average_pr1)
+        average_pr.insert(1, 'By Net Income', average_pr2)
+        average_pr = average_pr.sort_values('By Operating Income', ascending=False)
+        average_pr = average_pr.head(10)
+
+        print('Average Profit Ratio')
+        print(average_pr)
+
+        x_1 = average_pr.index
+
+        y_1 = average_pr['By Operating Income'].values
+        y_2 = average_pr['By Net Income'].values
+        x = np.arange(len(x_1))
+        width = 0.35
+
+        fig, ax = plt.subplots()
+        ax.set_title('Profit Ratio Ranking Graph (Top10)')
+        ax.set_xlabel('Company')
+        ax.set_ylabel('Average %')
+        ax.set_xticks(x)
+        ax.set_xticklabels(x_1)
+        ax.bar(x - width / 2, y_1, label='Calc by Operating Income')
+        ax.bar(x + width / 2, y_2, label='Calc by Net Income')
+        ax.legend()
+        plt.tight_layout()
+        plt.show()
+
 
 if __name__ == '__main__':
     ai = Analysis_Income()
-    company_code = input('Company_Code? =')
-    ai.inquiry(company_code)
-    ai.profit_graph(company_code)
+    # company_code = input('Company_Code? = ')
+    # ai.inquiry(company_code)
+    # ai.profit_graph(company_code)
+    ai.Ranking()
