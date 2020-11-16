@@ -2,6 +2,7 @@
 import pandas as pd
 from stocks import Stocks_Read
 from serialize import Data
+import matplotlib.pyplot as plt
 
 
 class Ranking:
@@ -54,6 +55,19 @@ class Ranking:
 
         print("Ranking")
         print(point)
+
+        point = point.head(10)
+        x = point.index
+        y = point.values
+        fig, ax = plt.subplots()
+        ax.set_title('Change Price Ranking Graph (Top10)')
+        ax.set_xlabel('Company')
+        ax.set_ylabel('Point Average + Variant * -1')
+
+        ax.bar(x, y, label='Point')
+        ax.legend()
+        plt.tight_layout()
+        plt.show()
 
 
 if __name__ == '__main__':
