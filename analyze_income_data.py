@@ -22,8 +22,10 @@ class Analysis_Income:
 
     # class Inquiry:
     def inquiry(self, company_code):
-        pd.set_option('display.max_columns', None)
-        print(self.income_collection.ie_dict.get(company_code))
+        # pd.set_option('display.max_columns', None)
+        result = self.income_collection.ie_dict.get(company_code)
+        # result.to_excel('./test.xlsx')
+        return result
 
     # class Graph:
     def profit_graph(self, company_code):

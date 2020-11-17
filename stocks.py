@@ -8,13 +8,18 @@ class Stocks:
     def __init__(self):
         self.stocks = []
 
+    def __getitem__(self, i):
+        return self.stocks[i]
+
+    def __len__(self):
+        return self.stocks.__len__()
 
 class Stocks_Write(Stocks):
 
     def __init__(self):
         super().__init__()
 
-    def get_stocks(self, jasdaq):
+    def get_stocks(self, jasdaq) -> int:
         tickers = jasdaq.tickers
 
         for i in range(len(tickers.tickers)):
@@ -26,7 +31,7 @@ class Stocks_Write(Stocks):
 
         data = Data()  # Create Data class of serialize.py
         data.save_data('stock', self.stocks)  # Save data to stock file
-
+        return self.__len__()
 
 class Stocks_Read(Stocks):
     def __init__(self):
@@ -49,8 +54,8 @@ class Stocks_Read(Stocks):
 
         self.stocks = data.load_data(filename)
 
-        for i in range(len(self.stocks)):
-            elt = self.stocks[i]
+        for i in range(self.__len__()):
+            elt = self.__getitem__(i)
 
             self.open_price.insert(loc=i, column=elt.company, value=elt.get_open())
             self.close_price.insert(loc=i, column=elt.company, value=elt.get_close())

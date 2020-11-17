@@ -21,7 +21,7 @@ class Incomes_Write(Incomes):
     def __init__(self):
         super().__init__()
 
-    def get_incomes(self, jasdaq):
+    def get_incomes(self, jasdaq) -> int:
         tickers = jasdaq.tickers
 
         for i in range(len(tickers.tickers)):
@@ -30,7 +30,7 @@ class Incomes_Write(Incomes):
 
         data = Data()  # Create Data class of serialize.py
         data.save_data('income', self.incomes)  # Save data to stock file
-
+        return self.__len__()
 
 class Incomes_Read(Incomes):
     def __init__(self):
@@ -44,7 +44,7 @@ class Incomes_Read(Incomes):
 
         self.data_read()
 
-    def data_read(self):
+    def data_read(self) -> int:
         # Deserialize Income-statement data
         filename = "income"  # data file name
         data = Data()
@@ -71,8 +71,9 @@ class Incomes_Read(Incomes):
         self.operating_incomes = pd.DataFrame(index=index)
         self.net_incomes = pd.DataFrame(index=index)
 
-        for i in range(len(self.incomes)):
-            elt = self.incomes[i]
+
+        for i in range(self.__len__()):
+            elt = self.__getitem__(i)
 
             self.total_revenues.insert(loc=i, column=elt.company, value=elt.get_total_revenue(),
                                        allow_duplicates=False)
@@ -92,3 +93,4 @@ class Incomes_Read(Incomes):
         print(self.operating_incomes)
         print(" *** Net Income *** ")
         print(self.net_incomes)
+        # return self.__len__()

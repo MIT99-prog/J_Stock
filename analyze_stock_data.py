@@ -5,14 +5,14 @@ from serialize import Data
 import matplotlib.pyplot as plt
 
 
-class Ranking:
+class Analysis_Stock:
     def __init__(self):
         self.stocks = []
         self.open_price = pd.DataFrame()
         self.close_price = pd.DataFrame()
         self.data = Data()
 
-        self.generate_ranking()
+        # self.generate_ranking()
 
     def generate_ranking(self):
         # Get Stocks data
@@ -71,4 +71,5 @@ class Ranking:
 
 
 if __name__ == '__main__':
-    Ranking()
+    # Ranking()
+    pass
