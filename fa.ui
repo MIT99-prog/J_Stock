@@ -65,6 +65,9 @@
     <property name="text">
      <string>損益計算書データ</string>
     </property>
+    <property name="checked">
+     <bool>true</bool>
+    </property>
    </widget>
    <widget class="QRadioButton" name="bs">
     <property name="geometry">

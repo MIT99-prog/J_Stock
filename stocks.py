@@ -19,8 +19,7 @@ class Stocks_Write(Stocks):
     def __init__(self):
         super().__init__()
 
-    def get_stocks(self, jasdaq) -> int:
-        tickers = jasdaq.tickers
+    def get_stocks(self, tickers) -> int:
 
         for i in range(len(tickers.tickers)):
             elt = Stock_Element(tickers.tickers[i].ticker, tickers.tickers[i].history(period="1mo"))

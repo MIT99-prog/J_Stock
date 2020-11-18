@@ -23,7 +23,7 @@ class Analysis_Income:
     # class Inquiry:
     def inquiry(self, company_code):
         # pd.set_option('display.max_columns', None)
-        result = self.income_collection.ie_dict.get(company_code)
+        result = self.income_collection.ie_dict.get(company_code + '.T')
         # result.to_excel('./test.xlsx')
         return result
 
@@ -55,14 +55,17 @@ class Analysis_Income:
         plt.show()
 
     def Ranking(self):
-        profit_ratios_1 = self.income_collection.operating_incomes / self.income_collection.total_revenues * 100
-        profit_ratios_2 = self.income_collection.net_incomes / self.income_collection.total_revenues * 100
+        profit_ratios_1 = self.income_collection.operating_incomes / \
+                          self.income_collection.total_revenues * 100
+        profit_ratios_2 = self.income_collection.net_incomes / \
+                          self.income_collection.total_revenues * 100
+
         average_pr1 = profit_ratios_1.mean(numeric_only=True)
         average_pr2 = profit_ratios_2.mean(numeric_only=True)
         average_pr = pd.DataFrame()
         average_pr.insert(0, 'By Operating Income', average_pr1)
         average_pr.insert(1, 'By Net Income', average_pr2)
-        average_pr = average_pr.sort_values('By Operating Income', ascending=False)
+        average_pr = average_pr.sort_values('By Net Income', ascending=False)
         average_pr = average_pr.head(10)
 
         print('Average Profit Ratio')

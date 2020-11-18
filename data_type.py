@@ -1,24 +1,32 @@
 #
-from market import Jasdaq
-from income_statement import Incomes_Write, Incomes_Read
-from stocks import Stocks_Write, Stocks_Read
+import pandas as pd
+import yfinance as yf
 
 from analyze_income_data import Analysis_Income
 from analyze_stock_data import Analysis_Stock
+from income_statement import Incomes_Write, Incomes_Read
+from stocks import Stocks_Write, Stocks_Read
 
 
 class Data_Type_Dispatcher:
     def __init__(self):
-        self.jasdaq = Jasdaq()
+        self.tickers = object
         self.number_record = 0
 
-    def write_data(self, data_type: str) -> int:
+    def write_data(self, companies, data_type) -> int:
+        # create Tickers
+        companies_t = [str(s) + ".T" for s in companies]
+        # get tickers from yahoo finance
+        self.tickers = yf.Tickers(" ".join(companies_t))
+        print(" *** tickers *** ")
+        print(self.tickers)
+
         # dispatch data by type
         if data_type == 'info':  # Company Information
             pass
         elif data_type == 'income':  # Income Statement
             iw = Incomes_Write()
-            number_record = iw.get_incomes(self.jasdaq)
+            number_record = iw.get_incomes(self.tickers)
             return number_record
         elif data_type == 'Balance':  # Balance Sheet
             pass
@@ -26,7 +34,7 @@ class Data_Type_Dispatcher:
             pass
         elif data_type == 'stock':  # Stock
             stw = Stocks_Write()
-            number_record = stw.get_stocks(self.jasdaq)
+            number_record = stw.get_stocks(self.tickers)
             return number_record
 
     def read_data(self, data_type) -> int:
@@ -46,7 +54,8 @@ class Data_Type_Dispatcher:
             self.number_record = sr.data_read()
             return self.number_record
 
-    def exec_inquiry(self, data_type, company):
+    @staticmethod
+    def exec_inquiry(data_type, company) -> pd.DataFrame:
         # Set data for inquiry
         # number_record = self.read_data(data_type)
         # print('Read ' + str(number_record) + ' Records')
@@ -67,8 +76,8 @@ class Data_Type_Dispatcher:
         elif data_type == 'stock':  # Stock
             pass
 
-
-    def exec_ranking(self, data_type):
+    @staticmethod
+    def exec_ranking(data_type):
         # Set data for inquiry
         # number_record = self.read_data(data_type)
         # print('Read ' + str(number_record) + ' Records')

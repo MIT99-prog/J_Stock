@@ -21,16 +21,21 @@ class Incomes_Write(Incomes):
     def __init__(self):
         super().__init__()
 
-    def get_incomes(self, jasdaq) -> int:
-        tickers = jasdaq.tickers
+    def get_incomes(self, tickers) -> int:
 
         for i in range(len(tickers.tickers)):
-            elt = Income_Element(tickers.tickers[i].ticker, tickers.tickers[i].financials)
-            self.incomes.append(elt)
+            try:
+                elt = Income_Element(tickers.tickers[i].ticker, tickers.tickers[i].financials)
+                self.incomes.append(elt)
+                print(" i= " + str(i))
+
+            except:
+                print(tickers.tickers[i].ticker.__repr__() + 'not be gotten')
 
         data = Data()  # Create Data class of serialize.py
         data.save_data('income', self.incomes)  # Save data to stock file
         return self.__len__()
+
 
 class Incomes_Read(Incomes):
     def __init__(self):
@@ -70,7 +75,6 @@ class Incomes_Read(Incomes):
         self.total_revenues = pd.DataFrame(index=index)
         self.operating_incomes = pd.DataFrame(index=index)
         self.net_incomes = pd.DataFrame(index=index)
-
 
         for i in range(self.__len__()):
             elt = self.__getitem__(i)
