@@ -22,7 +22,7 @@ class Stocks_Write(Stocks):
     def __init__(self):
         super().__init__()
 
-    def get_stocks(self, tickers) -> int:
+    def get_data(self, tickers) -> int:
 
         for i in range(len(tickers.tickers)):
             try:

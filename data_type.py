@@ -6,6 +6,10 @@ from analyze_income_data import Analysis_Income
 from analyze_stock_data import Analysis_Stock
 from income_statement import Incomes_Write, Incomes_Read
 from stocks import Stocks_Write, Stocks_Read
+from infomation import Infos_Write, Infos_Read
+from analyze_info_data import Analysis_Info
+
+
 
 
 class Data_Type_Dispatcher:
@@ -23,10 +27,12 @@ class Data_Type_Dispatcher:
 
         # dispatch data by type
         if data_type == 'info':  # Company Information
-            pass
+            ifw = Infos_Write()
+            number_record = ifw.get_data(self.tickers)
+            return number_record
         elif data_type == 'income':  # Income Statement
             iw = Incomes_Write()
-            number_record = iw.get_incomes(self.tickers)
+            number_record = iw.get_data(self.tickers)
             return number_record
         elif data_type == 'Balance':  # Balance Sheet
             pass
@@ -34,13 +40,14 @@ class Data_Type_Dispatcher:
             pass
         elif data_type == 'stock':  # Stock
             stw = Stocks_Write()
-            number_record = stw.get_stocks(self.tickers)
+            number_record = stw.get_data(self.tickers)
             return number_record
 
     def read_data(self, data_type) -> int:
         # dispatch data by type
         if data_type == 'info':  # Company Information
-            pass
+            ifo = Infos_Read()
+            self.number_record = ifo.data_read()
         elif data_type == 'income':  # Income Statement
             ir = Incomes_Read()  # initialize Income_Read class
             self.number_record = ir.data_read()  # set Income Statements Data
@@ -62,11 +69,12 @@ class Data_Type_Dispatcher:
 
         # dispatch data by type
         if data_type == 'info':  # Company Information
-            pass
+            aif = Analysis_Info()
+            result = aif.inquiry(company)
+            return result
         elif data_type == 'income':  # Income Statement
             ai = Analysis_Income()
             result = ai.inquiry(company)
-            # ai.profit_graph(company)
             return result
 
         elif data_type == 'Balance':  # Balance Sheet
