@@ -91,21 +91,21 @@ class Financial_Analysis(QWidget):
 
     def on_inquiry(self):
         # Market
-
+        market = self.check_data_type()
         # Data_type ( Read data for inquiry)
 
         # Company
         company_code = self.company.currentText()
 
         # Inquiry
-        result = self.dtd.exec_inquiry(self.check_data_type(), company_code)
+        result = self.dtd.exec_inquiry(market, company_code)
         if result is not None:
             # Display Income Statement
             ddf = Disp_DataFrame()
             ddf.show_dataframe(result)
 
         else:
-            er = Error(self.check_data_type(), company_code, 'Can not read!')
+            er = Error(market, company_code, 'Can not read!')
             erh = Error_Handler(er)
             erh.print_error()
 
@@ -146,31 +146,36 @@ class Disp_DataFrame(QWidget):
         QWidget.__init__(self)
         self.sub_widget = uic.loadUi('table.ui', self)
 
-    @staticmethod
-    def show_dataframe(df: pd.DataFrame):
-        sub_widget = Disp_DataFrame()
-        sub_widget.tableWidget.setRowCount(df.shape[0])
-        sub_widget.tableWidget.setColumnCount(df.shape[1])
+
+    def show_dataframe(self, df: pd.DataFrame):
+        # sub_widget = Disp_DataFrame()
+        self.sub_widget.tableWidget.setRowCount(df.shape[0])
+        self.sub_widget.tableWidget.setColumnCount(df.shape[1])
         # Set Data from DataFrame
         # Set Headers
         vheader = QHeaderView(QtCore.Qt.Vertical)
         vheader.setSectionResizeMode(QHeaderView.ResizeToContents)
-        sub_widget.tableWidget.setVerticalHeader(vheader)
-        sub_widget.tableWidget.setVerticalHeaderLabels(df.index.values)
+        self.sub_widget.tableWidget.setVerticalHeader(vheader)
+        # parse y_label to String
+        ylabel = []
+        for i in range(df.index.__len__()):
+            ylabel.append(str(df.index.values[i]))
+        self.sub_widget.tableWidget.setVerticalHeaderLabels(ylabel)
         hheader = QHeaderView(QtCore.Qt.Horizontal)
         hheader.setSectionResizeMode(QHeaderView.ResizeToContents)
-        sub_widget.tableWidget.setHorizontalHeader(hheader)
+        self.sub_widget.tableWidget.setHorizontalHeader(hheader)
+        # parse x_label to String
         xlabel = []
         for i in range(df.columns.__len__()):
             xlabel.append(str(df.columns.values[i]))
-        sub_widget.tableWidget.setHorizontalHeaderLabels(xlabel)
+        self.sub_widget.tableWidget.setHorizontalHeaderLabels(xlabel)
 
         # Set Data
         for i in range(df.shape[0]):
             for j in range(df.shape[1]):
                 item = QTableWidgetItem(str(df.values[i][j]))
-                sub_widget.tableWidget.setItem(i, j, item)
-        sub_widget.show()
+                self.sub_widget.tableWidget.setItem(i, j, item)
+        self.sub_widget.show()
 
 
 if __name__ == "__main__":

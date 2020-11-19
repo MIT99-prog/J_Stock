@@ -10,7 +10,7 @@ class Element:
 
 
 class Stock_Element(Element):
-    def __init__(self, code: str, data: pd.DataFrame):
+    def __init__(self, code='', data=pd.DataFrame()):
         super().__init__(code, data)
 
     def get_open(self) -> pd.Series:

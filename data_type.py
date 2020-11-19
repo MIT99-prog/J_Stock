@@ -74,7 +74,9 @@ class Data_Type_Dispatcher:
         elif data_type == 'Cash':  # Cash Flow
             pass
         elif data_type == 'stock':  # Stock
-            pass
+            ast = Analysis_Stock()
+            result = ast.inquiry(company)
+            return result
 
     @staticmethod
     def exec_ranking(data_type):

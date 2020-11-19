@@ -2,7 +2,7 @@
 import pandas as pd
 from element import Stock_Element
 from serialize import Data
-
+from error_handler import  Error_Handler, Error
 
 class Stocks:
     def __init__(self):
@@ -22,9 +22,15 @@ class Stocks_Write(Stocks):
     def get_stocks(self, tickers) -> int:
 
         for i in range(len(tickers.tickers)):
-            elt = Stock_Element(tickers.tickers[i].ticker, tickers.tickers[i].history(period="1mo"))
-            self.stocks.append(elt)
-            # valid intervals: 1m,2m,5m,15m,30m,60m,90m,1h,1d,5d,1wk,1mo,3mo
+            try:
+                elt = Stock_Element(tickers.tickers[i].ticker, tickers.tickers[i].history(period="1mo"))
+                self.stocks.append(elt)
+                # valid intervals: 1m,2m,5m,15m,30m,60m,90m,1h,1d,5d,1wk,1mo,3mo
+
+            except:
+                er = Error(self, str(tickers.tickers[i].ticker.__repr__()), 'Get Stock Data Error!')
+                erh = Error_Handler(er)
+                erh.print_error()
 
         # self.stocks = yf.download(self.tickers, period="1mo")  動かない！
 
@@ -37,6 +43,7 @@ class Stocks_Read(Stocks):
         super().__init__()
 
         # initialize values
+        self.se_dict = dict()  # Stock Dictionary
         self.open_price = pd.DataFrame()  # 始値
         self.close_price = pd.DataFrame()  # 終値
         self.high_price = pd.DataFrame()  # 高値
@@ -52,6 +59,13 @@ class Stocks_Read(Stocks):
         data = Data()
 
         self.stocks = data.load_data(filename)
+
+        # Create dictionary of income statement
+        se = Stock_Element()
+        for i in range(self.__len__()):
+            se.company = self.__getitem__(i).company
+            se.data = self.__getitem__(i).data
+            self.se_dict[se.company] = se.data
 
         for i in range(self.__len__()):
             elt = self.__getitem__(i)

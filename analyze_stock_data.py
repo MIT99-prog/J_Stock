@@ -12,11 +12,18 @@ class Analysis_Stock:
         self.close_price = pd.DataFrame()
         self.data = Data()
 
-        # self.generate_ranking()
-
-    def generate_ranking(self):
         # Get Stocks data
         self.stocks = Stocks_Read()
+        print('Data set completed!')
+
+    def inquiry(self, company_code):
+        # pd.set_option('display.max_columns', None)
+        result = self.stocks.se_dict.get(company_code + '.T')
+        # result.to_excel('./test.xlsx')
+        return result
+
+    def generate_ranking(self):
+
 
         # Calc Balance from Open Price to Close price
         balance = self.stocks.close_price - self.stocks.open_price

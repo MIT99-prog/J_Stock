@@ -3,11 +3,12 @@ import numpy as np
 import pandas as pd
 from element import Income_Element
 from serialize import Data
-
+from error_handler import Error_Handler, Error
 
 class Incomes:
     def __init__(self):
         self.incomes = []
+        # self.incomes = dict()
 
     def __getitem__(self, i):
         return self.incomes[i]
@@ -28,9 +29,12 @@ class Incomes_Write(Incomes):
                 elt = Income_Element(tickers.tickers[i].ticker, tickers.tickers[i].financials)
                 self.incomes.append(elt)
                 print(" i= " + str(i))
+                # self.incomes[tickers.tickers[i].ticker] = tickers.tickers[i].financials
 
             except:
-                print(tickers.tickers[i].ticker.__repr__() + 'not be gotten')
+                er = Error(self, str(tickers.tickers[i].ticker.__repr__()), 'Get Income Data Error!')
+                erh = Error_Handler(er)
+                erh.print_error()
 
         data = Data()  # Create Data class of serialize.py
         data.save_data('income', self.incomes)  # Save data to stock file
@@ -42,7 +46,7 @@ class Incomes_Read(Incomes):
         super().__init__()
 
         # initialize values
-        self.ie_dict = dict()  # dictionary of income statement
+        self.ie_dict = dict()  # Income Statement Dictionary
         self.total_revenues = pd.DataFrame()  # 売上高
         self.operating_incomes = pd.DataFrame()  # 営業利益
         self.net_incomes = pd.DataFrame()  # 当期純利益
@@ -98,3 +102,4 @@ class Incomes_Read(Incomes):
         print(" *** Net Income *** ")
         print(self.net_incomes)
         # return self.__len__()
+
