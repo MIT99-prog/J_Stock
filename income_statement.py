@@ -7,11 +7,13 @@ from error_handler import Error_Handler, Error
 
 class Incomes:
     def __init__(self):
-        self.incomes = []
-        # self.incomes = dict()
+        # self.incomes = []
+        self.incomes = dict()
 
     def __getitem__(self, i):
-        return self.incomes[i]
+        keys = self.incomes.keys()
+        key = list(keys)[i]
+        return self.incomes.get(key)
 
     def __len__(self):
         return self.incomes.__len__()
@@ -26,10 +28,10 @@ class Incomes_Write(Incomes):
 
         for i in range(len(tickers.tickers)):
             try:
-                elt = Income_Element(tickers.tickers[i].ticker, tickers.tickers[i].financials)
-                self.incomes.append(elt)
-                print(" i= " + str(i))
-                # self.incomes[tickers.tickers[i].ticker] = tickers.tickers[i].financials
+                # elt = Income_Element(tickers.tickers[i].ticker, tickers.tickers[i].financials)
+                # self.incomes.append(elt)
+                # print(" i= " + str(i))
+                self.incomes[tickers.tickers[i].ticker] = tickers.tickers[i].financials
 
             except:
                 er = Error(self, str(tickers.tickers[i].ticker.__repr__()), 'Get Income Data Error!')
@@ -46,7 +48,7 @@ class Incomes_Read(Incomes):
         super().__init__()
 
         # initialize values
-        self.ie_dict = dict()  # Income Statement Dictionary
+        # self.ie_dict = dict()  # Income Statement Dictionary
         self.total_revenues = pd.DataFrame()  # 売上高
         self.operating_incomes = pd.DataFrame()  # 営業利益
         self.net_incomes = pd.DataFrame()  # 当期純利益
@@ -61,25 +63,47 @@ class Incomes_Read(Incomes):
         self.incomes = data.load_data(filename)
 
         # Create dictionary of income statement
-        ie = Income_Element()
-        for i in range(self.__len__()):
-            ie.company = self.__getitem__(i).company
-            ie.data = self.__getitem__(i).data
-            self.ie_dict[ie.company] = ie.data
+        # ie = Income_Element()
+        # for i in range(self.__len__()):
+        #     ie.company = self.__getitem__(i).company
+        #     ie.data = self.__getitem__(i).data
+        #     self.ie_dict[ie.company] = ie.data
 
         # create index
         # index = self.incomes[0].data.T.index
-        index = self.__getitem__(0).data.T.index
+        # index = self.__getitem__(0).data.T.index
+
+        # initialize index
+        income = pd.DataFrame()
+        index = income.index
+
         for i in range(self.__len__()):
             # for i in range(len(self.incomes)):
-            index = index.append(self.__getitem__(i).data.T.index)
+            # index = index.append(self.__getitem__(i).data.T.index)
+            income = self.__getitem__(i)
+            index = index.append(income.T.index)
 
         index = set(index)
-        # create data
+        # create dataframes
         self.total_revenues = pd.DataFrame(index=index)
         self.operating_incomes = pd.DataFrame(index=index)
         self.net_incomes = pd.DataFrame(index=index)
 
+        # Dict to DataFrame
+        df = pd.DataFrame(self.incomes.values(), index=self.incomes.keys()).T
+        for i in range(len(df.keys())):
+            # Total Revenues
+            df_var = df.values[0][i].T['Total Revenue']
+            self.total_revenues.insert(loc=i, column=df.columns[i], value=df_var)
+            # Operating Incomes
+            df_var = df.values[0][i].T['Operating Income']
+            self.operating_incomes.insert(loc=i, column=df.columns[i], value=df_var)
+            # Net Incomes
+            df_var = df.values[0][i].T['Net Income']
+            self.net_incomes.insert(loc=i, column=df.columns[i], value=df_var)
+
+
+        '''
         for i in range(self.__len__()):
             elt = self.__getitem__(i)
 
@@ -89,7 +113,7 @@ class Incomes_Read(Incomes):
                                           allow_duplicates=False)
             self.net_incomes.insert(loc=i, column=elt.company, value=elt.get_net_income(),
                                     allow_duplicates=False)
-
+        '''
         # 欠損データの補完
         self.total_revenues = self.total_revenues.ffill()
         self.operating_incomes = self.operating_incomes.ffill()

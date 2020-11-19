@@ -6,10 +6,13 @@ from error_handler import  Error_Handler, Error
 
 class Stocks:
     def __init__(self):
-        self.stocks = []
+        # self.stocks = []
+        self.stocks = dict()
 
     def __getitem__(self, i):
-        return self.stocks[i]
+        keys = self.stocks.keys()
+        key = list(keys)[i]
+        return self.stocks.get(key)
 
     def __len__(self):
         return self.stocks.__len__()
@@ -23,9 +26,10 @@ class Stocks_Write(Stocks):
 
         for i in range(len(tickers.tickers)):
             try:
-                elt = Stock_Element(tickers.tickers[i].ticker, tickers.tickers[i].history(period="1mo"))
-                self.stocks.append(elt)
+                # elt = Stock_Element(tickers.tickers[i].ticker, tickers.tickers[i].history(period="1mo"))
+                # self.stocks.append(elt)
                 # valid intervals: 1m,2m,5m,15m,30m,60m,90m,1h,1d,5d,1wk,1mo,3mo
+                self.stocks[tickers.tickers[i].ticker] = tickers.tickers[i].history(period='1mo')
 
             except:
                 er = Error(self, str(tickers.tickers[i].ticker.__repr__()), 'Get Stock Data Error!')
@@ -43,7 +47,7 @@ class Stocks_Read(Stocks):
         super().__init__()
 
         # initialize values
-        self.se_dict = dict()  # Stock Dictionary
+        # self.se_dict = dict()  # Stock Dictionary
         self.open_price = pd.DataFrame()  # 始値
         self.close_price = pd.DataFrame()  # 終値
         self.high_price = pd.DataFrame()  # 高値
@@ -60,13 +64,43 @@ class Stocks_Read(Stocks):
 
         self.stocks = data.load_data(filename)
 
+
+
         # Create dictionary of income statement
+        '''
         se = Stock_Element()
         for i in range(self.__len__()):
             se.company = self.__getitem__(i).company
             se.data = self.__getitem__(i).data
             self.se_dict[se.company] = se.data
+        '''
+        # Dict to DataFrame
+        df = pd.DataFrame(self.stocks.values(), index=self.stocks.keys()).T
+        for i in range(len(df.keys())):
+            # Open Price
+            df_var = df.values[0][i]['Open']
+            self.open_price.insert(loc=i, column=df.columns[i], value=df_var)
+            # Clos Price
+            df_var = df.values[0][i]['Close']
+            self.close_price.insert(loc=i, column=df.columns[i], value=df_var)
+            # High Price
+            df_var = df.values[0][i]['High']
+            self.high_price.insert(loc=i, column=df.columns[i], value=df_var)
+            # Low Price
+            df_var = df.values[0][i]['Low']
+            self.low_price.insert(loc=i, column=df.columns[i], value=df_var)
+            # Volume
+            df_var = df.values[0][i]['Volume']
+            self.volume.insert(loc=i, column=df.columns[i], value=df_var)
+            # Dividends
+            df_var = df.values[0][i]['Dividends']
+            self.dividends.insert(loc=i, column=df.columns[i], value=df_var)
+            # Stock Splits
+            df_var = df.values[0][i]['Stock Splits']
+            self.stock_splits.insert(loc=i, column=df.columns[i], value=df_var)
 
+        # generate values
+        '''
         for i in range(self.__len__()):
             elt = self.__getitem__(i)
 
@@ -77,7 +111,7 @@ class Stocks_Read(Stocks):
             self.volume.insert(loc=i, column=elt.company, value=elt.get_volume())
             self.dividends.insert(loc=i, column=elt.company, value=elt.get_dividends())
             self.stock_splits.insert(loc=i, column=elt.company, value=elt.get_stock_splits())
-
+        '''
         # 欠損データの補完
         self.open_price = self.open_price.ffill()
         self.close_price = self.close_price.ffill()

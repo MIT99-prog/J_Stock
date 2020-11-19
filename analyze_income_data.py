@@ -10,9 +10,9 @@ import matplotlib.pyplot as plt
 class Analysis_Income:
     def __init__(self):
         self.income_collection = []
-        self.total_revenue = pd.DataFrame()
-        self.operating_income = pd.DataFrame()
-        self.net_income = pd.DataFrame()
+        # self.total_revenue = pd.DataFrame()
+        # self.operating_income = pd.DataFrame()
+        # self.net_income = pd.DataFrame()
         self.data = Data()
 
         # Get Income data
@@ -23,13 +23,14 @@ class Analysis_Income:
     # class Inquiry:
     def inquiry(self, company_code):
         # pd.set_option('display.max_columns', None)
-        result = self.income_collection.ie_dict.get(company_code + '.T')
+        # result = self.income_collection.ie_dict.get(company_code + '.T')
+        result = self.income_collection.incomes.get(company_code + '.T')
         # result.to_excel('./test.xlsx')
         return result
 
     # class Graph:
     def profit_graph(self, company_code):
-        company_element = Income_Element(company_code, self.income_collection.ie_dict.get(company_code))
+        company_element = Income_Element(company_code, self.income_collection.incomes.get(company_code))
 
         profit_ratio_1 = company_element.get_operating_income() / company_element.get_total_revenue() * 100
         profit_ratio_2 = company_element.get_net_income() / company_element.get_total_revenue() * 100
@@ -84,8 +85,8 @@ class Analysis_Income:
         ax.set_ylabel('Average %')
         ax.set_xticks(x)
         ax.set_xticklabels(x_1)
-        ax.bar(x - width / 2, y_1, label='Calc by Operating Income')
-        ax.bar(x + width / 2, y_2, label='Calc by Net Income')
+        ax.bar(x + width / 2, y_1, label='Calc by Operating Income')
+        ax.bar(x - width / 2, y_2, label='Calc by Net Income')
         ax.legend()
         plt.tight_layout()
         plt.show()

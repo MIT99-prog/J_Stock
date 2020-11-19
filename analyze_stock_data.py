@@ -1,32 +1,30 @@
 #
-import pandas as pd
-from stocks import Stocks_Read
-from serialize import Data
 import matplotlib.pyplot as plt
+
+from serialize import Data
+from stocks import Stocks_Read
 
 
 class Analysis_Stock:
     def __init__(self):
-        self.stocks = []
-        self.open_price = pd.DataFrame()
-        self.close_price = pd.DataFrame()
+        self.stock_collection = []
+        # self.open_price = pd.DataFrame()
+        # self.close_price = pd.DataFrame()
         self.data = Data()
 
         # Get Stocks data
-        self.stocks = Stocks_Read()
+        self.stock_collection = Stocks_Read()
         print('Data set completed!')
 
     def inquiry(self, company_code):
         # pd.set_option('display.max_columns', None)
-        result = self.stocks.se_dict.get(company_code + '.T')
+        result = self.stock_collection.stocks.get(company_code + '.T')
         # result.to_excel('./test.xlsx')
         return result
 
     def generate_ranking(self):
-
-
         # Calc Balance from Open Price to Close price
-        balance = self.stocks.close_price - self.stocks.open_price
+        balance = self.stock_collection.close_price - self.stock_collection.open_price
         print(" *** balance *** ")
         print(balance)
 
@@ -78,5 +76,4 @@ class Analysis_Stock:
 
 
 if __name__ == '__main__':
-    # Ranking()
     pass
