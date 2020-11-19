@@ -30,10 +30,12 @@ class Analysis_Income:
 
     # class Graph:
     def profit_graph(self, company_code):
-        company_element = Income_Element(company_code, self.income_collection.incomes.get(company_code))
+        # company_element = Income_Element(company_code, self.income_collection.incomes.get(company_code))
+        income = self.income_collection.incomes.get(company_code + '.T')
 
-        profit_ratio_1 = company_element.get_operating_income() / company_element.get_total_revenue() * 100
-        profit_ratio_2 = company_element.get_net_income() / company_element.get_total_revenue() * 100
+        # Calc Profit Ratio
+        profit_ratio_1 = income.T['Operating Income'] / income.T['Total Revenue'] * 100
+        profit_ratio_2 = income.T['Net Income'] / income.T['Total Revenue'] * 100
 
         # profit_ratio_1 = profit_ratio_1.sort_index()
 
@@ -42,6 +44,7 @@ class Analysis_Income:
         print('Ratio 2')
         print(profit_ratio_2)
 
+        # Generate Graph
         x = profit_ratio_1.index
         y_1 = profit_ratio_1.values
         y_2 = profit_ratio_2.values

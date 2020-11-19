@@ -36,6 +36,7 @@ class Financial_Analysis(QWidget):
         self.inquiry.clicked.connect(self.on_inquiry)
         self.rank.clicked.connect(self.on_rank)
         self.market.activated.connect(self.create_companies)
+        self.analysisGraph.clicked.connect(self.on_analysis_graph)
 
     def create_companies(self):
         # initialize mk market object
@@ -110,6 +111,11 @@ class Financial_Analysis(QWidget):
             erh.print_error()
 
         print("Inquiry Button was clicked!")
+
+    def on_analysis_graph(self):
+        # Company
+        company_code = self.company.currentText()
+        self.dtd.exec_analysis_graph(company_code)
 
     def on_rank(self):
         # Data_type

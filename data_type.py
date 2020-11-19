@@ -78,6 +78,10 @@ class Data_Type_Dispatcher:
             result = ast.inquiry(company)
             return result
 
+    def exec_analysis_graph(self, company):
+        ai = Analysis_Income()
+        ai.profit_graph(company)
+
     @staticmethod
     def exec_ranking(data_type):
         # Set data for inquiry
