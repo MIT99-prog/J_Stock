@@ -1,8 +1,9 @@
 #
 import pandas as pd
-from element import Stock_Element
+
+from error_handler import Error_Handler, Error
 from serialize import Data
-from error_handler import  Error_Handler, Error
+
 
 class Stocks:
     def __init__(self):
@@ -43,7 +44,7 @@ class Stocks_Write(Stocks):
         return self.__len__()
 
 class Stocks_Read(Stocks):
-    def __init__(self):
+    def __init__(self, read_type):
         super().__init__()
 
         # initialize values
@@ -56,9 +57,9 @@ class Stocks_Read(Stocks):
         self.dividends = pd.DataFrame()  # 配当
         self.stock_splits = pd.DataFrame()  # 分割
 
-        self.data_read()
+        self.data_read(read_type)
 
-    def data_read(self):
+    def data_read(self, read_type):
         filename = "stock"  # data file name
         data = Data()
 
@@ -74,54 +75,55 @@ class Stocks_Read(Stocks):
             se.data = self.__getitem__(i).data
             self.se_dict[se.company] = se.data
         '''
-        # Dict to DataFrame
-        df = pd.DataFrame(self.stocks.values(), index=self.stocks.keys()).T
-        for i in range(len(df.keys())):
-            # Open Price
-            df_var = df.values[0][i]['Open']
-            self.open_price.insert(loc=i, column=df.columns[i], value=df_var)
-            # Clos Price
-            df_var = df.values[0][i]['Close']
-            self.close_price.insert(loc=i, column=df.columns[i], value=df_var)
-            # High Price
-            df_var = df.values[0][i]['High']
-            self.high_price.insert(loc=i, column=df.columns[i], value=df_var)
-            # Low Price
-            df_var = df.values[0][i]['Low']
-            self.low_price.insert(loc=i, column=df.columns[i], value=df_var)
-            # Volume
-            df_var = df.values[0][i]['Volume']
-            self.volume.insert(loc=i, column=df.columns[i], value=df_var)
-            # Dividends
-            df_var = df.values[0][i]['Dividends']
-            self.dividends.insert(loc=i, column=df.columns[i], value=df_var)
-            # Stock Splits
-            df_var = df.values[0][i]['Stock Splits']
-            self.stock_splits.insert(loc=i, column=df.columns[i], value=df_var)
+        if read_type == 'Extend':
+            # Dict to DataFrame
+            df = pd.DataFrame(self.stocks.values(), index=self.stocks.keys()).T
+            for i in range(len(df.keys())):
+                # Open Price
+                df_var = df.values[0][i]['Open']
+                self.open_price.insert(loc=i, column=df.columns[i], value=df_var)
+                # Clos Price
+                df_var = df.values[0][i]['Close']
+                self.close_price.insert(loc=i, column=df.columns[i], value=df_var)
+                # High Price
+                df_var = df.values[0][i]['High']
+                self.high_price.insert(loc=i, column=df.columns[i], value=df_var)
+                # Low Price
+                df_var = df.values[0][i]['Low']
+                self.low_price.insert(loc=i, column=df.columns[i], value=df_var)
+                # Volume
+                df_var = df.values[0][i]['Volume']
+                self.volume.insert(loc=i, column=df.columns[i], value=df_var)
+                # Dividends
+                df_var = df.values[0][i]['Dividends']
+                self.dividends.insert(loc=i, column=df.columns[i], value=df_var)
+                # Stock Splits
+                df_var = df.values[0][i]['Stock Splits']
+                self.stock_splits.insert(loc=i, column=df.columns[i], value=df_var)
 
-        # generate values
-        '''
-        for i in range(self.__len__()):
-            elt = self.__getitem__(i)
+            # generate values
+            '''
+            for i in range(self.__len__()):
+                elt = self.__getitem__(i)
 
-            self.open_price.insert(loc=i, column=elt.company, value=elt.get_open())
-            self.close_price.insert(loc=i, column=elt.company, value=elt.get_close())
-            self.high_price.insert(loc=i, column=elt.company, value=elt.get_high())
-            self.low_price.insert(loc=i, column=elt.company, value=elt.get_low())
-            self.volume.insert(loc=i, column=elt.company, value=elt.get_volume())
-            self.dividends.insert(loc=i, column=elt.company, value=elt.get_dividends())
-            self.stock_splits.insert(loc=i, column=elt.company, value=elt.get_stock_splits())
-        '''
-        # 欠損データの補完
-        self.open_price = self.open_price.ffill()
-        self.close_price = self.close_price.ffill()
-        self.high_price = self.high_price.ffill()
-        self.low_price = self.low_price.ffill()
-        self.volume = self.volume.ffill()
-        self.dividends = self.dividends.ffill()
-        self.stock_splits = self.stock_splits.ffill()
+                self.open_price.insert(loc=i, column=elt.company, value=elt.get_open())
+                self.close_price.insert(loc=i, column=elt.company, value=elt.get_close())
+                self.high_price.insert(loc=i, column=elt.company, value=elt.get_high())
+                self.low_price.insert(loc=i, column=elt.company, value=elt.get_low())
+                self.volume.insert(loc=i, column=elt.company, value=elt.get_volume())
+                self.dividends.insert(loc=i, column=elt.company, value=elt.get_dividends())
+                self.stock_splits.insert(loc=i, column=elt.company, value=elt.get_stock_splits())
+            '''
+            # 欠損データの補完
+            self.open_price = self.open_price.ffill()
+            self.close_price = self.close_price.ffill()
+            self.high_price = self.high_price.ffill()
+            self.low_price = self.low_price.ffill()
+            self.volume = self.volume.ffill()
+            self.dividends = self.dividends.ffill()
+            self.stock_splits = self.stock_splits.ffill()
 
-        print(" *** open *** ")
-        print(self.open_price.shape)
-        print(" *** close *** ")
-        print(self.close_price.shape)
+            # print(" *** open *** ")
+            # print(self.open_price.shape)
+            # print(" *** close *** ")
+            # print(self.close_price.shape)

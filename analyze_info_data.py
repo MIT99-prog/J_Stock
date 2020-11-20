@@ -6,13 +6,13 @@ import pandas as pd
 
 
 class Analysis_Info:
-    def __init__(self):
+    def __init__(self, read_type):
         self.info_collection = []
 
         self.data = Data()
 
         # Get Stocks data
-        self.info_collection = Infos_Read()
+        self.info_collection = Infos_Read(read_type)
         print('Info Data set completed!')
 
     def inquiry(self, company_code):

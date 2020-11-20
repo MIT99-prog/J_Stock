@@ -6,14 +6,14 @@ from stocks import Stocks_Read
 
 
 class Analysis_Stock:
-    def __init__(self):
+    def __init__(self, read_type):
         self.stock_collection = []
         # self.open_price = pd.DataFrame()
         # self.close_price = pd.DataFrame()
         self.data = Data()
 
         # Get Stocks data
-        self.stock_collection = Stocks_Read()
+        self.stock_collection = Stocks_Read(read_type)
         print('Data set completed!')
 
     def inquiry(self, company_code):

@@ -5,12 +5,12 @@ from PyQt5 import QtCore
 from PyQt5 import uic
 from PyQt5.QtWidgets import QApplication, QWidget, QTableWidgetItem, QHeaderView
 import pandas as pd
-from data_type import Data_Type_Dispatcher
+from data_type import DataTypeDispatcher
 from error_handler import Error_Handler, Error
 from market import Tosho1, Tosho2, Mothers, Jasdaq
 
 
-class Financial_Analysis(QWidget):
+class FinancialAnalysis(QWidget):
     def __init__(self):
         QWidget.__init__(self)
         # Set initial data for these QComboBoxes of the widget
@@ -18,7 +18,7 @@ class Financial_Analysis(QWidget):
         # end_date = dt.today()
         # differ = delta(days=365)
         # start_date = end_date - differ
-        self.dtd = Data_Type_Dispatcher()
+        self.dtd = DataTypeDispatcher()
         self.data_type = ''
         # market and company
         self.market_items = ['市場第一部', '市場第二部', 'マザーズ', 'JASDAQ']
@@ -92,21 +92,22 @@ class Financial_Analysis(QWidget):
 
     def on_inquiry(self):
         # Market
-        market = self.check_data_type()
+        data_type = self.check_data_type()
         # Data_type ( Read data for inquiry)
 
         # Company
         company_code = self.company.currentText()
 
         # Inquiry
-        result = self.dtd.exec_inquiry(market, company_code)
+        result = self.dtd.exec_inquiry(data_type, company_code)
+        # Check the value of result
         if result is not None:
             # Display Income Statement
-            ddf = Disp_DataFrame()
+            ddf = DispDataFrame()
             ddf.show_dataframe(result)
 
         else:
-            er = Error(market, company_code, 'Can not read!')
+            er = Error(data_type, company_code, 'Can not read!')
             erh = Error_Handler(er)
             erh.print_error()
 
@@ -147,11 +148,10 @@ class Financial_Analysis(QWidget):
             return self.data_type
 
 
-class Disp_DataFrame(QWidget):
+class DispDataFrame(QWidget):
     def __init__(self):
         QWidget.__init__(self)
         self.sub_widget = uic.loadUi('table.ui', self)
-
 
     def show_dataframe(self, df: pd.DataFrame):
         # sub_widget = Disp_DataFrame()
@@ -187,7 +187,7 @@ class Disp_DataFrame(QWidget):
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     # Display Widget
-    widget = Financial_Analysis()
+    widget = FinancialAnalysis()
     widget.show()
 
     # print("Process was finished without exception!")

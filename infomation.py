@@ -1,8 +1,6 @@
 #
-import pandas as pd
-from element import Stock_Element
-from serialize import Data
 from error_handler import Error_Handler, Error
+from serialize import Data
 
 
 class Infomation:
@@ -40,14 +38,14 @@ class Infos_Write(Infomation):
 
 
 class Infos_Read(Infomation):
-    def __init__(self):
+    def __init__(self, read_type):
         super().__init__()
 
         # initialize values
 
-        self.data_read()
+        self.data_read(read_type)
 
-    def data_read(self):
+    def data_read(self, read_type):
         filename = "info"  # data file name
         data = Data()
 
@@ -56,3 +54,5 @@ class Infos_Read(Infomation):
         # Create dictionary of income statement
 
         # generate values
+        if read_type == 'Extend':
+            pass

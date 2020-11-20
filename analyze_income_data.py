@@ -1,14 +1,14 @@
 #
-import pandas as pd
+import matplotlib.pyplot as plt
 import numpy as np
-from element import Income_Element
+import pandas as pd
+
 from income_statement import Incomes_Read
 from serialize import Data
-import matplotlib.pyplot as plt
 
 
 class Analysis_Income:
-    def __init__(self):
+    def __init__(self, read_type):
         self.income_collection = []
         # self.total_revenue = pd.DataFrame()
         # self.operating_income = pd.DataFrame()
@@ -16,7 +16,7 @@ class Analysis_Income:
         self.data = Data()
 
         # Get Income data
-        self.income_collection = Incomes_Read()
+        self.income_collection = Incomes_Read(read_type)
 
         print('Data set completed!')
 
@@ -96,7 +96,7 @@ class Analysis_Income:
 
 
 if __name__ == '__main__':
-    ai = Analysis_Income()
+    ai = Analysis_Income('Extend')
     # company_code = input('Company_Code? = ')
     # ai.inquiry(company_code)
     # ai.profit_graph(company_code)

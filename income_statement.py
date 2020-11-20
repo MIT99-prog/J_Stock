@@ -1,9 +1,9 @@
 #
-import numpy as np
 import pandas as pd
-from element import Income_Element
-from serialize import Data
+
 from error_handler import Error_Handler, Error
+from serialize import Data
+
 
 class Incomes:
     def __init__(self):
@@ -44,7 +44,7 @@ class Incomes_Write(Incomes):
 
 
 class Incomes_Read(Incomes):
-    def __init__(self):
+    def __init__(self, read_type):
         super().__init__()
 
         # initialize values
@@ -53,9 +53,9 @@ class Incomes_Read(Incomes):
         self.operating_incomes = pd.DataFrame()  # 営業利益
         self.net_incomes = pd.DataFrame()  # 当期純利益
 
-        self.data_read()
+        self.data_read(read_type)
 
-    def data_read(self) -> int:
+    def data_read(self, read_type):
         # Deserialize Income-statement data
         filename = "income"  # data file name
         data = Data()
@@ -72,58 +72,58 @@ class Incomes_Read(Incomes):
         # create index
         # index = self.incomes[0].data.T.index
         # index = self.__getitem__(0).data.T.index
+        if read_type == 'Extend':
+            # initialize index
+            income = pd.DataFrame()
+            index = income.index
 
-        # initialize index
-        income = pd.DataFrame()
-        index = income.index
+            for i in range(self.__len__()):
+                # for i in range(len(self.incomes)):
+                # index = index.append(self.__getitem__(i).data.T.index)
+                income = self.__getitem__(i)
+                index = index.append(income.T.index)
 
-        for i in range(self.__len__()):
-            # for i in range(len(self.incomes)):
-            # index = index.append(self.__getitem__(i).data.T.index)
-            income = self.__getitem__(i)
-            index = index.append(income.T.index)
+            index = set(index)
+            # create dataframes
+            self.total_revenues = pd.DataFrame(index=index)
+            self.operating_incomes = pd.DataFrame(index=index)
+            self.net_incomes = pd.DataFrame(index=index)
 
-        index = set(index)
-        # create dataframes
-        self.total_revenues = pd.DataFrame(index=index)
-        self.operating_incomes = pd.DataFrame(index=index)
-        self.net_incomes = pd.DataFrame(index=index)
-
-        # Dict to DataFrame
-        df = pd.DataFrame(self.incomes.values(), index=self.incomes.keys()).T
-        for i in range(len(df.keys())):
-            # Total Revenues
-            df_var = df.values[0][i].T['Total Revenue']
-            self.total_revenues.insert(loc=i, column=df.columns[i], value=df_var)
-            # Operating Incomes
-            df_var = df.values[0][i].T['Operating Income']
-            self.operating_incomes.insert(loc=i, column=df.columns[i], value=df_var)
-            # Net Incomes
-            df_var = df.values[0][i].T['Net Income']
-            self.net_incomes.insert(loc=i, column=df.columns[i], value=df_var)
+            # Dict to DataFrame
+            df = pd.DataFrame(self.incomes.values(), index=self.incomes.keys()).T
+            for i in range(len(df.keys())):
+                # Total Revenues
+                df_var = df.values[0][i].T['Total Revenue']
+                self.total_revenues.insert(loc=i, column=df.columns[i], value=df_var)
+                # Operating Incomes
+                df_var = df.values[0][i].T['Operating Income']
+                self.operating_incomes.insert(loc=i, column=df.columns[i], value=df_var)
+                # Net Incomes
+                df_var = df.values[0][i].T['Net Income']
+                self.net_incomes.insert(loc=i, column=df.columns[i], value=df_var)
 
 
-        '''
-        for i in range(self.__len__()):
-            elt = self.__getitem__(i)
+            '''
+            for i in range(self.__len__()):
+                elt = self.__getitem__(i)
 
-            self.total_revenues.insert(loc=i, column=elt.company, value=elt.get_total_revenue(),
+                self.total_revenues.insert(loc=i, column=elt.company, value=elt.get_total_revenue(),
                                        allow_duplicates=False)
-            self.operating_incomes.insert(loc=i, column=elt.company, value=elt.get_operating_income(),
+                self.operating_incomes.insert(loc=i, column=elt.company, value=elt.get_operating_income(),
                                           allow_duplicates=False)
-            self.net_incomes.insert(loc=i, column=elt.company, value=elt.get_net_income(),
+                self.net_incomes.insert(loc=i, column=elt.company, value=elt.get_net_income(),
                                     allow_duplicates=False)
-        '''
-        # 欠損データの補完
-        self.total_revenues = self.total_revenues.ffill()
-        self.operating_incomes = self.operating_incomes.ffill()
-        self.net_incomes = self.net_incomes.ffill()
+            '''
+            # 欠損データの補完
+            self.total_revenues = self.total_revenues.ffill()
+            self.operating_incomes = self.operating_incomes.ffill()
+            self.net_incomes = self.net_incomes.ffill()
 
-        print(" *** Total Revenue *** ")
-        print(self.total_revenues)
-        print(" *** Operating Income *** ")
-        print(self.operating_incomes)
-        print(" *** Net Income *** ")
-        print(self.net_incomes)
-        # return self.__len__()
+            print(" *** Total Revenue *** ")
+            print(self.total_revenues)
+            print(" *** Operating Income *** ")
+            print(self.operating_incomes)
+            print(" *** Net Income *** ")
+            print(self.net_incomes)
+            # return self.__len__()
 
