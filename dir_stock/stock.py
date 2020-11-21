@@ -1,13 +1,14 @@
 #
 import pandas as pd
 
-from error_handler import Error_Handler, Error, ErrorList
-from serialize import Data
-from widget_helper import Result
+from errorhandler import ErrorHandler, Error, ErrorList
+from serialize import Data, FileName
+from widget_helper import Result, DisplayInfo
 
 
 class Stocks:
     def __init__(self):
+
         self.e_list = ErrorList()
         self.stocks = dict()
         self.result = Result()
@@ -21,10 +22,11 @@ class Stocks:
         return self.stocks.__len__()
 
 
-class Stocks_Write(Stocks):
+class StockWrite(Stocks):
 
-    def __init__(self):
+    def __init__(self, di: DisplayInfo):
         super().__init__()
+        self.filename = FileName(di.market, di.data_type)
 
     def get_data(self, tickers) -> Result:
 
@@ -36,13 +38,13 @@ class Stocks_Write(Stocks):
             except:
                 er = Error(self, str(tickers.tickers[i].ticker.__repr__()), 'Get Stock Data Error!')
                 self.e_list.add_list(er)
-                erh = Error_Handler(er)
+                erh = ErrorHandler(er)
                 erh.print_error()
 
         # self.stocks = yf.download(self.tickers, period="1mo")  動かない！
 
         data = Data()  # Create Data class of serialize.py
-        self.result = data.save_data('stock', self.stocks)  # Save data to stock file
+        self.result = data.save_data(self.filename, self.stocks)  # Save data to stock file
         if self.result.exec_continue:
             self.result.action_name = 'Get Stock History Data'
             self.result.result_type = 'number'
@@ -53,12 +55,13 @@ class Stocks_Write(Stocks):
         return self.result
 
 
-class Stocks_Read(Stocks):
-    def __init__(self, read_type):
+class StockRead(Stocks):
+    def __init__(self, di: DisplayInfo, read_type: str):
         super().__init__()
-
+        self.di = di
+        self.filename = FileName(di.market, di.data_type)
         # initialize values
-        # self.se_dict = dict()  # Stock Dictionary
+        self.read_type = read_type
         self.open_price = pd.DataFrame()  # 始値
         self.close_price = pd.DataFrame()  # 終値
         self.high_price = pd.DataFrame()  # 高値
@@ -67,19 +70,19 @@ class Stocks_Read(Stocks):
         self.dividends = pd.DataFrame()  # 配当
         self.stock_splits = pd.DataFrame()  # 分割
 
-        self.result = self.data_read(read_type)
+        self.result = self.data_read()
 
-    def data_read(self, read_type):
-        filename = "stock"  # data file name
+    def data_read(self):
+
         data = Data()
-        self.result = data.load_data(filename)
+        self.result = data.load_data(self.filename)
         if self.result.exec_continue:
             self.stocks = self.result.result_data
         else:
             pass
 
         # Extend mode
-        if read_type == 'Extend':
+        if self.read_type == 'Extend':
             # Dict to DataFrame
             df = pd.DataFrame(self.stocks.values(), index=self.stocks.keys()).T
             for i in range(len(df.keys())):
@@ -108,7 +111,7 @@ class Stocks_Read(Stocks):
                 except KeyError:
                     er = Error(KeyError, df.keys()[i], 'missing data error in Balance Sheet')
                     self.e_list.add_list(er)
-                    erh = Error_Handler(er)
+                    erh = ErrorHandler(er)
                     erh.print_error()
                     # Recover missing data
                     self.open_price.insert(loc=i, column=df.columns[i], value=None)

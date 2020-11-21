@@ -1,9 +1,9 @@
 #
 import pandas as pd
 
-from error_handler import Error_Handler, Error, ErrorList
-from serialize import Data
-from widget_helper import Result
+from errorhandler import ErrorHandler, Error, ErrorList
+from serialize import Data, FileName
+from widget_helper import Result, DisplayInfo
 
 class BSes:
     def __init__(self):
@@ -21,8 +21,9 @@ class BSes:
 
 class BSesWrite(BSes):
 
-    def __init__(self):
+    def __init__(self, di: DisplayInfo):
         super().__init__()
+        self.filename = FileName(di.market, di.data_type)
 
     def get_data(self, tickers) -> Result:
 
@@ -33,11 +34,11 @@ class BSesWrite(BSes):
             except:
                 er = Error(self, str(tickers.tickers[i].ticker.__repr__()), 'Get BS Data Error!')
                 self.e_list.add_list(er)
-                erh = Error_Handler(er)
+                erh = ErrorHandler(er)
                 erh.print_error()
 
         data = Data()  # Create Data class of serialize.py
-        self.result = data.save_data('balance', self.bses)  # Save data to stock file
+        self.result = data.save_data(self.filename, self.bses)  # Save data to stock file
         if self.result.exec_continue:
             self.result.action_name = 'Get Balance Sheet Data'
             self.result.result_type = 'number'
@@ -48,8 +49,9 @@ class BSesWrite(BSes):
         return self.result
 
 class BSesRead(BSes):
-    def __init__(self, read_type):
+    def __init__(self, di: DisplayInfo, read_type: str):
         super().__init__()
+        self.filename = FileName(di.market, di.data_type)
 
         # initialize values
         self.total_assets = pd.DataFrame()  # 資産
@@ -62,11 +64,14 @@ class BSesRead(BSes):
 
     def data_read(self, read_type) -> Result:
         # Deserialize Balance Sheet data
-        filename = "balance"  # data file name
         data = Data()
-        self.result = data.load_data(filename)
+        self.result = data.load_data(self.filename)
         if self.result.exec_continue:
             self.bses = self.result.result_data
+            self.result.action_name = 'Read Balance Sheet Data Base Mode'
+            self.result.result_type = 'number'
+            self.result.result_data = self.__len__()
+            self.result.error_list = self.e_list
         else:
             pass
 
@@ -110,7 +115,7 @@ class BSesRead(BSes):
                 except KeyError:
                     er = Error(KeyError, df.keys()[i], 'missing data error in Balance Sheet')
                     self.e_list.add_list(er)
-                    erh = Error_Handler(er)
+                    erh = ErrorHandler(er)
                     erh.print_error()
                     # Recover missing data
                     self.total_assets.insert(loc=i, column=df.columns[i], value=None)
@@ -128,18 +133,11 @@ class BSesRead(BSes):
             self.total_current_liabilities = self.total_current_liabilities.ffill()
             self.total_current_assets = self.total_current_assets.ffill()
 
-            # print(" *** Total Revenue *** ")
-            # print(self.total_assets)
-            # print(" *** Operating Income *** ")
-            # print(self.total_liab)
-            # print(" *** Net Income *** ")
-            # print(self.total_stockholder_equity)
-
-        self.result.action_name = 'Read Balance Sheet Data'
-        self.result.result_type = 'number'
-        self.result.result_data = self.__len__()
-        self.result.error_list = self.e_list
-        if self.result.result_data == 0:
-            self.result.exec_continue = False
+            self.result.action_name = 'Read Balance Sheet Data Extend Mode'
+            self.result.result_type = 'number'
+            self.result.result_data = self.__len__()
+            self.result.error_list = self.e_list
+            if self.result.result_data == 0:
+                self.result.exec_continue = False
 
         return self.result

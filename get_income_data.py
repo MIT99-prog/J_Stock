@@ -1,8 +1,6 @@
 #
-import pandas as pd
-import yfinance as yf
 
-from income_statement import IncomesWrite
+from dir_income_statement.income_statement import IncomesWrite
 from market import Jasdaq
 
 if __name__ == '__main__':

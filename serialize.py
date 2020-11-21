@@ -1,8 +1,17 @@
 #
 
 import joblib
-from error_handler import Error, ErrorList
+from errorhandler import Error, ErrorList
 from widget_helper import Result
+
+class FileName:
+    def __init__(self, market: str, data_type: str):
+        self.market = market
+        self.data_type = data_type
+
+    def get_file_name(self) -> str:
+        return './' + self.data_type + '_' + self.market
+
 
 
 class Data:
@@ -15,11 +24,11 @@ class Data:
     def __exit__(self, exc_type, exc_val, exc_tb):
         pass
 
-    def save_data(self, filename: str, value) -> Result:
+    def save_data(self, filename: FileName, value) -> Result:
         self.result.action_name = 'save_data'
-        filename = "./" + filename
+
         try:
-            with open(filename, "wb") as f:
+            with open(filename.get_file_name(), "wb") as f:
                 joblib.dump(value, f, compress=3)
         except:
             pass
@@ -27,17 +36,17 @@ class Data:
 
         # print("save data!")
 
-    def load_data(self, filename: str) -> Result:
+    def load_data(self, filename: FileName) -> Result:
         self.result.action_name = 'load_data'
-        filename = "./" + filename
+
         try:
-            with open(filename, "rb") as f:
+            with open(filename.get_file_name(), "rb") as f:
                 self.result.result_data = joblib.load(f)
                 self.result.result_type = 'dict'
                 # return value
 
         except FileNotFoundError:
-            er = Error(FileNotFoundError, filename, 'File not found!')
+            er = Error(FileNotFoundError, filename.get_file_name(), 'File not found!')
             e_list = ErrorList()
             e_list.add_list(er)
             self.result.error_list = e_list

@@ -1,17 +1,16 @@
 #
-import matplotlib.pyplot as plt
 
-from error_handler import Error, ErrorList
-from stocks import Stocks_Read
-from widget_helper import Result, Graph
+from errorhandler import Error, ErrorList
+from dir_stock.stock import StockRead
+from widget_helper import Result, Graph, DisplayInfo
 
 
 class AnalysisStock:
-    def __init__(self, read_type):
+    def __init__(self, di: DisplayInfo, read_type: str):
         self.stock_collection = []
-
+        self.di = di
         # Get Stocks data
-        self.stock_collection = Stocks_Read(read_type)
+        self.stock_collection = StockRead(di, read_type)
         if self.stock_collection.result.exec_continue:
             print('Stock History Data (' + str(self.stock_collection.result.result_data) + ') set completed!')
             # Prepare Result Class
@@ -19,12 +18,12 @@ class AnalysisStock:
         else:
             pass
 
-    def inquiry(self, company) -> Result:
+    def inquiry(self) -> Result:
         self.result.action_name = 'Inquiry Stock History'
         self.result.result_type = 'dataframe'
-        self.result.result_data = self.stock_collection.stocks.get(company + '.T')
+        self.result.result_data = self.stock_collection.stocks.get(self.di.company + '.T')
         if self.result.exec_continue is False:
-            er = Error(ValueError, company, 'Hit No Data')
+            er = Error(ValueError, self.di.company, 'Hit No Data')
             e_list = ErrorList().add_list(er)
             self.result.error_list = e_list
             self.result.exec_continue = False

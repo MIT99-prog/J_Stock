@@ -1,9 +1,9 @@
 #
 import pandas as pd
 
-from error_handler import Error_Handler, Error, ErrorList
-from serialize import Data
-from widget_helper import Result
+from errorhandler import ErrorHandler, Error, ErrorList
+from serialize import Data, FileName
+from widget_helper import Result, DisplayInfo
 
 
 class Incomes:
@@ -23,8 +23,9 @@ class Incomes:
 
 class IncomesWrite(Incomes):
 
-    def __init__(self):
+    def __init__(self, di: DisplayInfo):
         super().__init__()
+        self.filename = FileName(di.market, di.data_type)
 
     def get_data(self, tickers) -> Result:
 
@@ -35,11 +36,11 @@ class IncomesWrite(Incomes):
 
             except:
                 er = Error(self, str(tickers.tickers[i].ticker.__repr__()), 'Get Income Data Error!')
-                erh = Error_Handler(er)
+                erh = ErrorHandler(er)
                 erh.print_error()
 
         data = Data()  # Create Data class of serialize.py
-        self.result = data.save_data('income', self.incomes)  # Save data to stock file
+        self.result = data.save_data(self.filename, self.incomes)  # Save data to stock file
         if self.result.exec_continue:
             self.result.action_name = 'Get Balance Sheet Data'
             self.result.result_type = 'number'
@@ -51,24 +52,27 @@ class IncomesWrite(Incomes):
 
 
 class IncomesRead(Incomes):
-    def __init__(self, read_type):
+    def __init__(self, di: DisplayInfo, read_type: str):
         super().__init__()
-
+        self.filename = FileName(di.market, di.data_type)
         # initialize values
         # self.ie_dict = dict()  # Income Statement Dictionary
         self.total_revenues = pd.DataFrame()  # 売上高
         self.operating_incomes = pd.DataFrame()  # 営業利益
         self.net_incomes = pd.DataFrame()  # 当期純利益
 
-        self.data_read(read_type)
+        self.result = self.data_read(read_type)
 
     def data_read(self, read_type) -> Result:
         # Deserialize Income-statement data
-        filename = "income"  # data file name
         data = Data()
-        self.result = data.load_data(filename)
+        self.result = data.load_data(self.filename)
         if self.result.exec_continue:
             self.incomes = self.result.result_data
+            self.result.action_name = 'Read Income Statement Data Base Mode'
+            self.result.result_type = 'number'
+            self.result.result_data = self.__len__()
+            self.result.error_list = self.e_list
         else:
             pass
 
@@ -79,8 +83,7 @@ class IncomesRead(Incomes):
             index = income.index
 
             for i in range(self.__len__()):
-                # for i in range(len(self.incomes)):
-                # index = index.append(self.__getitem__(i).data.T.index)
+
                 income = self.__getitem__(i)
                 index = index.append(income.T.index)
 
@@ -108,17 +111,11 @@ class IncomesRead(Incomes):
             self.operating_incomes = self.operating_incomes.ffill()
             self.net_incomes = self.net_incomes.ffill()
 
-            # print(" *** Total Revenue *** ")
-            # print(self.total_revenues)
-            # print(" *** Operating Income *** ")
-            # print(self.operating_incomes)
-            # print(" *** Net Income *** ")
-            # print(self.net_incomes)
-        self.result.action_name = 'Read Income Statement Data'
-        self.result.result_type = 'number'
-        self.result.result_data = self.__len__()
-        self.result.error_list = self.e_list
-        if self.result.result_data == 0:
-            self.result.exec_continue = False
+            self.result.action_name = 'Read Income Statement Data Extend Mode'
+            self.result.result_type = 'number'
+            self.result.result_data = self.__len__()
+            self.result.error_list = self.e_list
+            if self.result.result_data == 0:
+                self.result.exec_continue = False
 
         return self.result

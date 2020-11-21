@@ -5,9 +5,8 @@ from PyQt5 import uic
 from PyQt5.QtWidgets import QApplication, QWidget
 
 from data_type import DataTypeDispatcher
-from error_handler import Error_Handler, Error
 from market import Tosho1, Tosho2, Mothers, Jasdaq
-from widget_helper import DispDataFrame, Result, WidgetHelper
+from widget_helper import Result, WidgetHelper, DisplayInfo
 
 
 class FinancialAnalysis(QWidget):
@@ -16,10 +15,12 @@ class FinancialAnalysis(QWidget):
         # Set initial data for the widget
         # Data Type (Information / Income Statement / Balance Sheet / Cash Flow / Stock)
         self.dtd = DataTypeDispatcher()
+        self.market = ''
         self.data_type = ''
 
         # market and company
         self.market_items = ['市場第一部', '市場第二部', 'マザーズ', 'JASDAQ']
+        self.market_items_e = ['mkt1', 'mkt2', 'mothers', 'jasdaq']
         self.companies = []
 
         # Load form file(.ui)
@@ -27,13 +28,13 @@ class FinancialAnalysis(QWidget):
 
         # Set items to these QComboBoxes
         for i in range(len(self.market_items)):
-            self.market.addItem(self.market_items[i])
+            self.wmarket.addItem(self.market_items[i])
 
         # sign connect to slot
         self.getData.clicked.connect(self.on_get_data)
         self.inquiry.clicked.connect(self.on_inquiry)
         self.rank.clicked.connect(self.on_rank)
-        self.market.activated.connect(self.create_companies)
+        self.wmarket.activated.connect(self.create_companies)
         self.analysisGraph.clicked.connect(self.on_analysis_graph)
 
         # Prepare Result Class
@@ -42,43 +43,19 @@ class FinancialAnalysis(QWidget):
     # Slots
     def on_get_data(self):
         # Get info from screen widget
-        # Market
-        # if self.market.currentText() == 'JASDAQ':
-        #    jasdaq = Jasdaq()
+        di = self.create_display_info()
 
-        # Data_type
-
-        if self.info.isChecked():  # Company Information
-            self.data_type = 'info'
-
-        elif self.pl.isChecked():  # Income Statement
-            self.data_type = 'income'
-
-        elif self.bs.isChecked():  # Balance Sheet
-            self.data_type = 'balance'
-
-        elif self.cf.isChecked():  # Cash Flow
-            self.data_type = 'cash'
-
-        elif self.stock.isChecked():  # Stock
-            self.data_type = 'stock'
-
-        self.result = self.dtd.write_data(self.companies, self.data_type)
+        self.result = self.dtd.write_data(di)
 
         self.message.setText(self.data_type + "データが " + str(self.result.result_data) + "件　取得できました！")
 
         print("GetData process is completed!")
 
     def on_inquiry(self):
-        # Market
-        # Need a program in widget_helper
-        # Data_type ( Read data for inquiry)
-        data_type = self.check_data_type()
-        # Company
-        company = self.company.currentText()
-
+        # Generate Display Information
+        di = self.create_display_info()
         # Inquiry
-        self.result = self.dtd.exec_inquiry(data_type, company)
+        self.result = self.dtd.exec_inquiry(di)
         # Check the value of result
         wh = WidgetHelper()
         wh.parse_result(self.result)
@@ -86,37 +63,40 @@ class FinancialAnalysis(QWidget):
         print("Inquiry Button was clicked!")
 
     def on_analysis_graph(self):
-        # Company
-        company = self.company.currentText()
-        self.result = self.dtd.exec_analysis_graph(self.check_data_type(), company)
+        # Generate Display Information
+        di = self.create_display_info()
+        self.result = self.dtd.exec_analysis_graph(di)
         wh = WidgetHelper()
         wh.parse_result(self.result)
-
 
     def on_rank(self):
-        # Data_type
-        # number_record = self.dtd.read_data(self.check_data_type())
-        # print('Read ' + str(number_record) + ' Records')
-        self.result = self.dtd.exec_ranking(self.check_data_type())
+        # Generate Display Information
+        di = self.create_display_info()
+        self.result = self.dtd.exec_ranking(di)
         wh = WidgetHelper()
         wh.parse_result(self.result)
 
-
     # -----------
+    def check_market(self) -> str:
+        self.market = self.wmarket.currentText()
+        # Translate to English
+        self.market = self.market_items_e[self.market_items.index(self.market)]
+        return self.market
+
     def create_companies(self):  # Create Company List by Market
         # initialize mk market object
         mk = object
         # set market object
-        if self.market.currentText() == '市場第一部':
+        if self.wmarket.currentText() == '市場第一部':
             mk = Tosho1()
 
-        elif self.market.currentText() == '市場第二部':
+        elif self.wmarket.currentText() == '市場第二部':
             mk = Tosho2()
 
-        elif self.market.currentText() == 'マザーズ':
+        elif self.wmarket.currentText() == 'マザーズ':
             mk = Mothers()
 
-        elif self.market.currentText() == 'JASDAQ':
+        elif self.wmarket.currentText() == 'JASDAQ':
             mk = Jasdaq()
 
         # set companies by market
@@ -147,6 +127,11 @@ class FinancialAnalysis(QWidget):
         elif self.stock.isChecked():  # Stock
             self.data_type = 'stock'
             return self.data_type
+
+    def create_display_info(self) -> DisplayInfo:
+        di = DisplayInfo(self.check_market(), self.check_data_type(),
+                         self.companies, self.company.currentText())
+        return di
 
 
 if __name__ == "__main__":

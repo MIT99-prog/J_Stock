@@ -1,18 +1,17 @@
 #
 
-from information import InfosRead
-from serialize import Data
+from dir_information.information import InfosRead
 import pandas as pd
 
-from error_handler import Error, ErrorList
-from widget_helper import Result
+from errorhandler import Error, ErrorList
+from widget_helper import Result, DisplayInfo
 
 class Analysis_Info:
-    def __init__(self, read_type):
+    def __init__(self, di: DisplayInfo, read_type: str):
         self.info_collection = []
-
+        self.di = di
         # Get Company Information data
-        self.info_collection = InfosRead(read_type)
+        self.info_collection = InfosRead(di, read_type)
         if self.info_collection.result.exec_continue:
             print('Company Information Data (' + str(len(self.info_collection.result.result_data)) + ') set completed!')
             # Prepare Result Class
@@ -21,12 +20,12 @@ class Analysis_Info:
             pass
 
     # class Inquiry
-    def inquiry(self, company) -> Result:
+    def inquiry(self) -> Result:
         self.result.action_name = 'Inquiry Company Information'
         self.result.result_type = 'dataframe'
-        self.result.result_data = self.info_collection.infos.get(company + '.T')
+        self.result.result_data = self.info_collection.infos.get(self.di.company + '.T')
         if self.result.exec_continue is False:
-            er = Error(ValueError, company, 'Hit No Data')
+            er = Error(ValueError, self.di.company, 'Hit No Data')
             e_list = ErrorList().add_list(er)
             self.result.error_list = e_list
             self.result.exec_continue = False

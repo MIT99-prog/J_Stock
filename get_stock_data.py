@@ -1,8 +1,6 @@
 #
-import pandas as pd
-import yfinance as yf
 
-from stocks import Stocks_Write
+from dir_stock.stock import StockWrite
 from market import Jasdaq
 
 if __name__ == '__main__':
@@ -10,5 +8,5 @@ if __name__ == '__main__':
     jasdaq = Jasdaq()
 
     # Get stock collection data and save stock file
-    st = Stocks_Write()
+    st = StockWrite()
     st.get_stocks(jasdaq)

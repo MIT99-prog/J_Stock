@@ -1,7 +1,7 @@
 #
-from error_handler import Error_Handler, Error, ErrorList
-from serialize import Data
-from widget_helper import Result
+from errorhandler import ErrorHandler, Error, ErrorList
+from serialize import Data, FileName
+from widget_helper import Result, DisplayInfo
 
 
 class Infomation:
@@ -21,8 +21,9 @@ class Infomation:
 
 class InfosWrite(Infomation):
 
-    def __init__(self):
+    def __init__(self, di: DisplayInfo):
         super().__init__()
+        self.filename = FileName(di.market, di.data_type)
 
     def get_data(self, tickers) -> Result:
 
@@ -33,11 +34,11 @@ class InfosWrite(Infomation):
             except:
                 er = Error(self, str(tickers.tickers[i].ticker.__repr__()), 'Get Info Data Error!')
                 self.e_list.add_list(er)
-                erh = Error_Handler(er)
+                erh = ErrorHandler(er)
                 erh.print_error()
 
         data = Data()  # Create Data class of serialize.py
-        self.result = data.save_data('info', self.infos)  # Save data to stock file
+        self.result = data.save_data(self.filename, self.infos)  # Save data to stock file
         if self.result.exec_continue:
             self.result.action_name = 'Get Company Information Data'
             self.result.result_type = 'number'
@@ -49,25 +50,26 @@ class InfosWrite(Infomation):
 
 
 class InfosRead(Infomation):
-    def __init__(self, read_type):
+    def __init__(self, di: DisplayInfo, read_type: str):
         super().__init__()
+        self.filename = FileName(di.market, di.data_type)
+        self.read_type = read_type
 
         # initialize values
 
-        self.result = self.data_read(read_type)
+        self.result = self.data_read()
 
-    def data_read(self, read_type) -> Result:
-        filename = "info"  # data file name
+    def data_read(self) -> Result:
         data = Data()
 
-        self.result = data.load_data(filename)
+        self.result = data.load_data(self.filename)
         if self.result.exec_continue:
             self.infos = self.result.result_data
         else:
             pass
 
         # generate values
-        if read_type == 'Extend':
+        if self.read_type == 'Extend':
             pass
 
         return self.result

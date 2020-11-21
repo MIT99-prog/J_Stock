@@ -2,17 +2,17 @@
 import matplotlib.pyplot as plt
 import pandas as pd
 
-from balance_sheet import BSesRead
-from error_handler import Error, ErrorList
-from widget_helper import Result, Graph
+from dir_balance_sheet.balance_sheet import BSesRead
+from errorhandler import Error, ErrorList
+from widget_helper import Result, Graph, DisplayInfo
 
 
 class AnalysisBS:
-    def __init__(self, read_type):
+    def __init__(self, di: DisplayInfo, read_type: str):
         self.bs_collection = []
-
+        self.di = di
         # Get Balance Sheet data
-        self.bs_collection = BSesRead(read_type)
+        self.bs_collection = BSesRead(di, read_type)
         if self.bs_collection.result.exec_continue:
             print('Balance Sheet Data (' + str(self.bs_collection.result.result_data) + ') set completed!')
             # Prepare Result Class
@@ -21,12 +21,12 @@ class AnalysisBS:
             pass
 
     # class Inquiry:
-    def inquiry(self, company) -> Result:
+    def inquiry(self) -> Result:
         self.result.action_name = 'Inquiry Balance Sheet'
         self.result.result_type = 'dataframe'
-        self.result.result_data = self.bs_collection.bses.get(company + '.T')
+        self.result.result_data = self.bs_collection.bses.get(self.di.company + '.T')
         if self.result.exec_continue is False:
-            er = Error(ValueError, company, 'Hit No Data')
+            er = Error(ValueError, self.di.company, 'Hit No Data')
             e_list = ErrorList().add_list(er)
             self.result.error_list = e_list
             self.result.exec_continue = False
@@ -34,8 +34,8 @@ class AnalysisBS:
         return self.result
 
     # class Graph:
-    def ratio_graph(self, company_code):
-        bs = self.bs_collection.bses.get(company_code + '.T')
+    def ratio_graph(self, di):
+        bs = self.bs_collection.bses.get(di.company + '.T')
 
         # Calc Profit Ratio
         ratio_1 = bs.T['Total Stockholder Equity'] / bs.T['Total Assets'] * 100  # 自己資本比率

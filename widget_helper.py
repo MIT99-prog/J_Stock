@@ -5,7 +5,15 @@ from PyQt5 import QtCore
 import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
-from error_handler import Error_Handler
+from errorhandler import ErrorHandler, ErrorList
+
+
+class DisplayInfo:
+    def __init__(self, market, data_type, companies, company=''):
+        self.market = market
+        self.data_type = data_type
+        self.companies = companies
+        self.company = company
 
 
 class Result:
@@ -13,7 +21,7 @@ class Result:
         self.action_name = ''
         self.result_type = ''  # 'number' / 'dataframe' / 'graph'
         self.result_data = object  # data object
-        self.error_list = object  # 'Errorlist' object
+        self.error_list = ErrorList()  # 'Errorlist' object
         self.exec_continue = True  # Bool value
 
 
@@ -81,7 +89,8 @@ class GenerateGraph:
     def __init__(self):
         pass
 
-    def line_graph(self, graph_object: Graph):
+    @staticmethod
+    def line_graph(graph_object: Graph):
         # initialize values
         x = []
         y = []
@@ -101,7 +110,8 @@ class GenerateGraph:
         ax.legend()
         plt.show()
 
-    def bar_graph(self, graph_object: Graph):
+    @staticmethod
+    def bar_graph(graph_object: Graph):
         x = []
         y = []
 
@@ -135,7 +145,8 @@ class WidgetHelper:
     def __init__(self):
         pass
 
-    def parse_result(self, r: Result):
+    @staticmethod
+    def parse_result(r: Result):
         if r.exec_continue:
             if r.result_type == 'dataframe':
                 ddf = DispDataFrame()
@@ -152,9 +163,8 @@ class WidgetHelper:
                 print('result_type is out of barns')
                 print('Type = ' + r.result_type)
         else:
-            error_list = r.error_list
-            for i in range(error_list.get_length):
-                er = error_list.error_list[i]
-                erh = Error_Handler(er)
+            # error_list = r.error_list
+            for i in range(r.error_list.get_length()):
+                er = r.error_list.error_list[i]
+                erh = ErrorHandler(er)
                 erh.print_error()
-

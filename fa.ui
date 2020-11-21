@@ -10,7 +10,7 @@
     <x>0</x>
     <y>0</y>
     <width>599</width>
-    <height>418</height>
+    <height>436</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -28,14 +28,19 @@
   <widget class="QLabel" name="label">
    <property name="geometry">
     <rect>
-     <x>210</x>
-     <y>20</y>
-     <width>141</width>
-     <height>21</height>
+     <x>190</x>
+     <y>10</y>
+     <width>211</width>
+     <height>31</height>
     </rect>
    </property>
+   <property name="font">
+    <font>
+     <pointsize>14</pointsize>
+    </font>
+   </property>
    <property name="text">
-    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:12pt; font-weight:600;&quot;&gt;財務分析メニュー&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;財務分析メニュー&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
    </property>
    <property name="alignment">
     <set>Qt::AlignCenter</set>
@@ -45,10 +50,15 @@
    <property name="geometry">
     <rect>
      <x>40</x>
-     <y>90</y>
-     <width>201</width>
-     <height>191</height>
+     <y>120</y>
+     <width>211</width>
+     <height>171</height>
     </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>10</pointsize>
+    </font>
    </property>
    <property name="title">
     <string>取得データ</string>
@@ -66,7 +76,7 @@
      <string>損益計算書データ</string>
     </property>
     <property name="checked">
-     <bool>true</bool>
+     <bool>false</bool>
     </property>
    </widget>
    <widget class="QRadioButton" name="bs">
@@ -74,7 +84,7 @@
      <rect>
       <x>30</x>
       <y>80</y>
-      <width>131</width>
+      <width>171</width>
       <height>17</height>
      </rect>
     </property>
@@ -87,7 +97,7 @@
      <rect>
       <x>30</x>
       <y>110</y>
-      <width>121</width>
+      <width>171</width>
       <height>17</height>
      </rect>
     </property>
@@ -100,12 +110,15 @@
      <rect>
       <x>30</x>
       <y>20</y>
-      <width>111</width>
+      <width>161</width>
       <height>17</height>
      </rect>
     </property>
     <property name="text">
      <string>企業概要データ</string>
+    </property>
+    <property name="checked">
+     <bool>true</bool>
     </property>
    </widget>
    <widget class="QRadioButton" name="stock">
@@ -113,7 +126,7 @@
      <rect>
       <x>30</x>
       <y>140</y>
-      <width>82</width>
+      <width>141</width>
       <height>17</height>
      </rect>
     </property>
@@ -127,9 +140,14 @@
     <rect>
      <x>310</x>
      <y>60</y>
-     <width>91</width>
+     <width>141</width>
      <height>31</height>
     </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>12</pointsize>
+    </font>
    </property>
    <property name="text">
     <string>データ取得</string>
@@ -138,21 +156,31 @@
   <widget class="QComboBox" name="company">
    <property name="geometry">
     <rect>
-     <x>120</x>
-     <y>300</y>
+     <x>130</x>
+     <y>320</y>
      <width>91</width>
-     <height>22</height>
+     <height>31</height>
     </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>10</pointsize>
+    </font>
    </property>
   </widget>
   <widget class="QLabel" name="label_2">
    <property name="geometry">
     <rect>
-     <x>60</x>
-     <y>300</y>
-     <width>61</width>
-     <height>21</height>
+     <x>50</x>
+     <y>320</y>
+     <width>71</width>
+     <height>31</height>
     </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>12</pointsize>
+    </font>
    </property>
    <property name="text">
     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;企業コード&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
@@ -161,11 +189,16 @@
   <widget class="QPushButton" name="inquiry">
    <property name="geometry">
     <rect>
-     <x>270</x>
-     <y>300</y>
-     <width>91</width>
+     <x>260</x>
+     <y>320</y>
+     <width>111</width>
      <height>31</height>
     </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>12</pointsize>
+    </font>
    </property>
    <property name="text">
     <string>データ検索</string>
@@ -177,8 +210,13 @@
      <x>40</x>
      <y>370</y>
      <width>541</width>
-     <height>31</height>
+     <height>51</height>
     </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>10</pointsize>
+    </font>
    </property>
   </widget>
   <widget class="QPushButton" name="rank">
@@ -186,22 +224,32 @@
     <rect>
      <x>310</x>
      <y>110</y>
-     <width>91</width>
+     <width>141</width>
      <height>31</height>
     </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>12</pointsize>
+    </font>
    </property>
    <property name="text">
     <string>ランキング表示</string>
    </property>
   </widget>
-  <widget class="QComboBox" name="market">
+  <widget class="QComboBox" name="wmarket">
    <property name="geometry">
     <rect>
-     <x>110</x>
+     <x>140</x>
      <y>60</y>
      <width>91</width>
-     <height>22</height>
+     <height>31</height>
     </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>10</pointsize>
+    </font>
    </property>
   </widget>
   <widget class="QLabel" name="label_3">
@@ -213,6 +261,11 @@
      <height>21</height>
     </rect>
    </property>
+   <property name="font">
+    <font>
+     <pointsize>12</pointsize>
+    </font>
+   </property>
    <property name="text">
     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;市場&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
    </property>
@@ -223,11 +276,16 @@
   <widget class="QPushButton" name="analysisGraph">
    <property name="geometry">
     <rect>
-     <x>380</x>
-     <y>300</y>
-     <width>91</width>
+     <x>420</x>
+     <y>320</y>
+     <width>121</width>
      <height>31</height>
     </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>12</pointsize>
+    </font>
    </property>
    <property name="text">
     <string>分析グラフ</string>
