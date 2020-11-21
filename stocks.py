@@ -1,14 +1,16 @@
 #
 import pandas as pd
 
-from error_handler import Error_Handler, Error
+from error_handler import Error_Handler, Error, ErrorList
 from serialize import Data
+from widget_helper import Result
 
 
 class Stocks:
     def __init__(self):
-        # self.stocks = []
+        self.e_list = ErrorList()
         self.stocks = dict()
+        self.result = Result()
 
     def __getitem__(self, i):
         keys = self.stocks.keys()
@@ -18,30 +20,38 @@ class Stocks:
     def __len__(self):
         return self.stocks.__len__()
 
+
 class Stocks_Write(Stocks):
 
     def __init__(self):
         super().__init__()
 
-    def get_data(self, tickers) -> int:
+    def get_data(self, tickers) -> Result:
 
         for i in range(len(tickers.tickers)):
             try:
-                # elt = Stock_Element(tickers.tickers[i].ticker, tickers.tickers[i].history(period="1mo"))
-                # self.stocks.append(elt)
                 # valid intervals: 1m,2m,5m,15m,30m,60m,90m,1h,1d,5d,1wk,1mo,3mo
                 self.stocks[tickers.tickers[i].ticker] = tickers.tickers[i].history(period='1mo')
 
             except:
                 er = Error(self, str(tickers.tickers[i].ticker.__repr__()), 'Get Stock Data Error!')
+                self.e_list.add_list(er)
                 erh = Error_Handler(er)
                 erh.print_error()
 
         # self.stocks = yf.download(self.tickers, period="1mo")  動かない！
 
         data = Data()  # Create Data class of serialize.py
-        data.save_data('stock', self.stocks)  # Save data to stock file
-        return self.__len__()
+        self.result = data.save_data('stock', self.stocks)  # Save data to stock file
+        if self.result.exec_continue:
+            self.result.action_name = 'Get Stock History Data'
+            self.result.result_type = 'number'
+            self.result.result_data = self.__len__()
+            self.result.error_list = self.e_list
+        else:
+            pass
+        return self.result
+
 
 class Stocks_Read(Stocks):
     def __init__(self, read_type):
@@ -57,63 +67,60 @@ class Stocks_Read(Stocks):
         self.dividends = pd.DataFrame()  # 配当
         self.stock_splits = pd.DataFrame()  # 分割
 
-        self.data_read(read_type)
+        self.result = self.data_read(read_type)
 
     def data_read(self, read_type):
         filename = "stock"  # data file name
         data = Data()
+        self.result = data.load_data(filename)
+        if self.result.exec_continue:
+            self.stocks = self.result.result_data
+        else:
+            pass
 
-        self.stocks = data.load_data(filename)
-
-
-
-        # Create dictionary of income statement
-        '''
-        se = Stock_Element()
-        for i in range(self.__len__()):
-            se.company = self.__getitem__(i).company
-            se.data = self.__getitem__(i).data
-            self.se_dict[se.company] = se.data
-        '''
+        # Extend mode
         if read_type == 'Extend':
             # Dict to DataFrame
             df = pd.DataFrame(self.stocks.values(), index=self.stocks.keys()).T
             for i in range(len(df.keys())):
-                # Open Price
-                df_var = df.values[0][i]['Open']
-                self.open_price.insert(loc=i, column=df.columns[i], value=df_var)
-                # Clos Price
-                df_var = df.values[0][i]['Close']
-                self.close_price.insert(loc=i, column=df.columns[i], value=df_var)
-                # High Price
-                df_var = df.values[0][i]['High']
-                self.high_price.insert(loc=i, column=df.columns[i], value=df_var)
-                # Low Price
-                df_var = df.values[0][i]['Low']
-                self.low_price.insert(loc=i, column=df.columns[i], value=df_var)
-                # Volume
-                df_var = df.values[0][i]['Volume']
-                self.volume.insert(loc=i, column=df.columns[i], value=df_var)
-                # Dividends
-                df_var = df.values[0][i]['Dividends']
-                self.dividends.insert(loc=i, column=df.columns[i], value=df_var)
-                # Stock Splits
-                df_var = df.values[0][i]['Stock Splits']
-                self.stock_splits.insert(loc=i, column=df.columns[i], value=df_var)
+                try:
+                    # Open Price
+                    df_var = df.values[0][i]['Open']
+                    self.open_price.insert(loc=i, column=df.columns[i], value=df_var)
+                    # Clos Price
+                    df_var = df.values[0][i]['Close']
+                    self.close_price.insert(loc=i, column=df.columns[i], value=df_var)
+                    # High Price
+                    df_var = df.values[0][i]['High']
+                    self.high_price.insert(loc=i, column=df.columns[i], value=df_var)
+                    # Low Price
+                    df_var = df.values[0][i]['Low']
+                    self.low_price.insert(loc=i, column=df.columns[i], value=df_var)
+                    # Volume
+                    df_var = df.values[0][i]['Volume']
+                    self.volume.insert(loc=i, column=df.columns[i], value=df_var)
+                    # Dividends
+                    df_var = df.values[0][i]['Dividends']
+                    self.dividends.insert(loc=i, column=df.columns[i], value=df_var)
+                    # Stock Splits
+                    df_var = df.values[0][i]['Stock Splits']
+                    self.stock_splits.insert(loc=i, column=df.columns[i], value=df_var)
+                except KeyError:
+                    er = Error(KeyError, df.keys()[i], 'missing data error in Balance Sheet')
+                    self.e_list.add_list(er)
+                    erh = Error_Handler(er)
+                    erh.print_error()
+                    # Recover missing data
+                    self.open_price.insert(loc=i, column=df.columns[i], value=None)
+                    self.close_price.insert(loc=i, column=df.columns[i], value=None)
+                    self.high_price.insert(loc=i, column=df.columns[i], value=None)
+                    self.low_price.insert(loc=i, column=df.columns[i], value=None)
+                    self.volume.insert(loc=i, column=df.columns[i], value=None)
+                    self.dividends.insert(loc=i, column=df.columns[i], value=None)
+                    self.stock_splits.insert(loc=i, column=df.columns[i], value=None)
 
-            # generate values
-            '''
-            for i in range(self.__len__()):
-                elt = self.__getitem__(i)
+                    continue
 
-                self.open_price.insert(loc=i, column=elt.company, value=elt.get_open())
-                self.close_price.insert(loc=i, column=elt.company, value=elt.get_close())
-                self.high_price.insert(loc=i, column=elt.company, value=elt.get_high())
-                self.low_price.insert(loc=i, column=elt.company, value=elt.get_low())
-                self.volume.insert(loc=i, column=elt.company, value=elt.get_volume())
-                self.dividends.insert(loc=i, column=elt.company, value=elt.get_dividends())
-                self.stock_splits.insert(loc=i, column=elt.company, value=elt.get_stock_splits())
-            '''
             # 欠損データの補完
             self.open_price = self.open_price.ffill()
             self.close_price = self.close_price.ffill()
@@ -127,3 +134,11 @@ class Stocks_Read(Stocks):
             # print(self.open_price.shape)
             # print(" *** close *** ")
             # print(self.close_price.shape)
+        self.result.action_name = 'Read Stock History Data'
+        self.result.result_type = 'number'
+        self.result.result_data = self.__len__()
+        self.result.error_list = self.e_list
+        if self.result.result_data == 0:
+            self.result.exec_continue = False
+
+        return self.result

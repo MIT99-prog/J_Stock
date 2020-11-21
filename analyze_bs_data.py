@@ -1,35 +1,45 @@
 #
 import matplotlib.pyplot as plt
-import numpy as np
 import pandas as pd
 
-from balance_sheet import BSes_Read
+from balance_sheet import BSesRead
+from error_handler import Error, ErrorList
+from widget_helper import Result, Graph
 
 
-class Analysis_BS:
+class AnalysisBS:
     def __init__(self, read_type):
         self.bs_collection = []
 
-        # Get Income data
-        self.bs_collection = BSes_Read(read_type)
-
-        print('Data set completed!')
+        # Get Balance Sheet data
+        self.bs_collection = BSesRead(read_type)
+        if self.bs_collection.result.exec_continue:
+            print('Balance Sheet Data (' + str(self.bs_collection.result.result_data) + ') set completed!')
+            # Prepare Result Class
+            self.result = Result()
+        else:
+            pass
 
     # class Inquiry:
-    def inquiry(self, company_code):
-        result = self.bs_collection.bses.get(company_code + '.T')
+    def inquiry(self, company) -> Result:
+        self.result.action_name = 'Inquiry Balance Sheet'
+        self.result.result_type = 'dataframe'
+        self.result.result_data = self.bs_collection.bses.get(company + '.T')
+        if self.result.exec_continue is False:
+            er = Error(ValueError, company, 'Hit No Data')
+            e_list = ErrorList().add_list(er)
+            self.result.error_list = e_list
+            self.result.exec_continue = False
         # result.to_excel('./test.xlsx')
-        return result
+        return self.result
 
     # class Graph:
     def ratio_graph(self, company_code):
-
         bs = self.bs_collection.bses.get(company_code + '.T')
 
         # Calc Profit Ratio
         ratio_1 = bs.T['Total Stockholder Equity'] / bs.T['Total Assets'] * 100  # 自己資本比率
         ratio_2 = bs.T['Total Current Assets'] / bs.T['Total Current Liabilities'] * 100  # 流動比率
-
 
         print("Ratio 1")
         print(ratio_1)
@@ -50,11 +60,11 @@ class Analysis_BS:
         ax.legend()
         plt.show()
 
-    def Ranking(self):
+    def generate_ranking(self):
         ratios_1 = self.bs_collection.total_stockholder_equity / \
-                          self.bs_collection.total_assets * 100  # 自己資本比率
+                   self.bs_collection.total_assets * 100  # 自己資本比率
         ratios_2 = self.bs_collection.total_current_assets / \
-                          self.bs_collection.total_current_liabilities * 100  # 流動比率
+                   self.bs_collection.total_current_liabilities  # 流動比率
 
         average_pr1 = ratios_1.mean(numeric_only=True)
         average_pr2 = ratios_2.mean(numeric_only=True)
@@ -64,24 +74,25 @@ class Analysis_BS:
         average_pr = average_pr.sort_values('Capital adequacy ratio', ascending=False)
         average_pr = average_pr.head(10)
 
-        print('Capital adequacy ratio & Current ratio')
         print(average_pr)
 
-        x_1 = average_pr.index
+        # generate Graph Object
+        g = Graph()
+        g.set_title('Capital Adequacy Ratio Ranking Graph (Top10)')
+        # bar1
+        g.set_x_label('Company')
+        g.set_y_label('Average %')
+        g.set_data_label('Capital adequacy ratio')
+        g.set_data(average_pr['Capital adequacy ratio'])
+        # bar2
+        g.set_x_label('Company')
+        g.set_y_label('Average %')
+        g.set_data_label('Current Ratio (1/100)')
+        g.set_data(average_pr['Current Ratio'])
 
-        y_1 = average_pr['Capital adequacy ratio'].values
-        y_2 = average_pr['Current ratio'].values
-        x = np.arange(len(x_1))
-        width = 0.35
-
-        fig, ax = plt.subplots()
-        ax.set_title('Capital adequacy ratio Ranking Graph (Top10)')
-        ax.set_xlabel('Company')
-        ax.set_ylabel('Average %')
-        ax.set_xticks(x)
-        ax.set_xticklabels(x_1)
-        ax.bar(x + width / 2, y_1, label='Capital adequacy ratio')
-        ax.bar(x - width / 2, y_2, label='Current ratio')
-        ax.legend()
-        plt.tight_layout()
-        plt.show()
+        # Generate Result Class
+        self.result.action_name = 'generate Capital Adequacy Ratio ranking'
+        self.result.result_type = 'bar graph'
+        self.result.result_data = g
+        self.result.exec_continue = True
+        return self.result

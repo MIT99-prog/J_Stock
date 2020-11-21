@@ -9,6 +9,7 @@ class Error_Handler:
               + ' / name = ' + self.error.name
               + ' / message = ' + self.error.message)
 
+
 class Error(Exception):
     def __init__(self, type=object, name='', message=''):
         super().__init__()
@@ -16,13 +17,13 @@ class Error(Exception):
         self.name = name
         self.message = message
 
-class Error_list:
+
+class ErrorList:
     def __init__(self):
         self.error_list = []
 
-    def addlist(self, error: Error):
+    def add_list(self, error: Error):
         self.error_list.append(error)
 
     def get_length(self):
         return self.error_list.__len__()
-

@@ -1,28 +1,26 @@
 # This Python file uses the following encoding: utf-8
 import sys
 
-from PyQt5 import QtCore
 from PyQt5 import uic
-from PyQt5.QtWidgets import QApplication, QWidget, QTableWidgetItem, QHeaderView
-import pandas as pd
+from PyQt5.QtWidgets import QApplication, QWidget
+
 from data_type import DataTypeDispatcher
 from error_handler import Error_Handler, Error
 from market import Tosho1, Tosho2, Mothers, Jasdaq
+from widget_helper import DispDataFrame, Result, WidgetHelper
 
 
 class FinancialAnalysis(QWidget):
     def __init__(self):
         QWidget.__init__(self)
-        # Set initial data for these QComboBoxes of the widget
-        # Start Date and End Date for Get Data
-        # end_date = dt.today()
-        # differ = delta(days=365)
-        # start_date = end_date - differ
+        # Set initial data for the widget
+        # Data Type (Information / Income Statement / Balance Sheet / Cash Flow / Stock)
         self.dtd = DataTypeDispatcher()
         self.data_type = ''
+
         # market and company
         self.market_items = ['市場第一部', '市場第二部', 'マザーズ', 'JASDAQ']
-        self.company_items = []
+        self.companies = []
 
         # Load form file(.ui)
         uic.loadUi('fa.ui', self)
@@ -38,29 +36,10 @@ class FinancialAnalysis(QWidget):
         self.market.activated.connect(self.create_companies)
         self.analysisGraph.clicked.connect(self.on_analysis_graph)
 
-    def create_companies(self):
-        # initialize mk market object
-        mk = object
-        # set market object
-        if self.market.currentText() == '市場第一部':
-            mk = Tosho1()
+        # Prepare Result Class
+        self.result = Result()
 
-        elif self.market.currentText() == '市場第二部':
-            mk = Tosho2()
-
-        elif self.market.currentText() == 'マザーズ':
-            mk = Mothers()
-
-        elif self.market.currentText() == 'JASDAQ':
-            mk = Jasdaq()
-        # set company code by market
-        self.company_items = mk.market_code
-
-        self.company.clear()
-
-        for i in range(len(self.company_items)):
-            self.company.addItem(str(self.company_items[i]))
-
+    # Slots
     def on_get_data(self):
         # Get info from screen widget
         # Market
@@ -84,45 +63,67 @@ class FinancialAnalysis(QWidget):
         elif self.stock.isChecked():  # Stock
             self.data_type = 'stock'
 
-        number_record = self.dtd.write_data(self.company_items, self.data_type)
+        self.result = self.dtd.write_data(self.companies, self.data_type)
 
-        self.message.setText(self.data_type + "データが " + str(number_record) + "件　取得できました！")
+        self.message.setText(self.data_type + "データが " + str(self.result.result_data) + "件　取得できました！")
 
         print("GetData process is completed!")
 
     def on_inquiry(self):
         # Market
-        data_type = self.check_data_type()
+        # Need a program in widget_helper
         # Data_type ( Read data for inquiry)
-
+        data_type = self.check_data_type()
         # Company
-        company_code = self.company.currentText()
+        company = self.company.currentText()
 
         # Inquiry
-        result = self.dtd.exec_inquiry(data_type, company_code)
+        self.result = self.dtd.exec_inquiry(data_type, company)
         # Check the value of result
-        if result is not None:
-            # Display Income Statement
-            ddf = DispDataFrame()
-            ddf.show_dataframe(result)
-
-        else:
-            er = Error(data_type, company_code, 'Can not read!')
-            erh = Error_Handler(er)
-            erh.print_error()
+        wh = WidgetHelper()
+        wh.parse_result(self.result)
 
         print("Inquiry Button was clicked!")
 
     def on_analysis_graph(self):
         # Company
-        company_code = self.company.currentText()
-        self.dtd.exec_analysis_graph(company_code)
+        company = self.company.currentText()
+        self.result = self.dtd.exec_analysis_graph(self.check_data_type(), company)
+        wh = WidgetHelper()
+        wh.parse_result(self.result)
+
 
     def on_rank(self):
         # Data_type
         # number_record = self.dtd.read_data(self.check_data_type())
         # print('Read ' + str(number_record) + ' Records')
-        self.dtd.exec_ranking(self.check_data_type())
+        self.result = self.dtd.exec_ranking(self.check_data_type())
+        wh = WidgetHelper()
+        wh.parse_result(self.result)
+
+
+    # -----------
+    def create_companies(self):  # Create Company List by Market
+        # initialize mk market object
+        mk = object
+        # set market object
+        if self.market.currentText() == '市場第一部':
+            mk = Tosho1()
+
+        elif self.market.currentText() == '市場第二部':
+            mk = Tosho2()
+
+        elif self.market.currentText() == 'マザーズ':
+            mk = Mothers()
+
+        elif self.market.currentText() == 'JASDAQ':
+            mk = Jasdaq()
+
+        # set companies by market
+        self.companies = mk.companies
+        self.company.clear()
+        for i in range(len(self.companies)):
+            self.company.addItem(str(self.companies[i]))
 
     def check_data_type(self) -> str:
         # Data_type
@@ -146,42 +147,6 @@ class FinancialAnalysis(QWidget):
         elif self.stock.isChecked():  # Stock
             self.data_type = 'stock'
             return self.data_type
-
-
-class DispDataFrame(QWidget):
-    def __init__(self):
-        QWidget.__init__(self)
-        self.sub_widget = uic.loadUi('table.ui', self)
-
-    def show_dataframe(self, df: pd.DataFrame):
-        # sub_widget = Disp_DataFrame()
-        self.sub_widget.tableWidget.setRowCount(df.shape[0])
-        self.sub_widget.tableWidget.setColumnCount(df.shape[1])
-        # Set Data from DataFrame
-        # Set Headers
-        vheader = QHeaderView(QtCore.Qt.Vertical)
-        vheader.setSectionResizeMode(QHeaderView.ResizeToContents)
-        self.sub_widget.tableWidget.setVerticalHeader(vheader)
-        # parse y_label to String
-        ylabel = []
-        for i in range(df.index.__len__()):
-            ylabel.append(str(df.index.values[i]))
-        self.sub_widget.tableWidget.setVerticalHeaderLabels(ylabel)
-        hheader = QHeaderView(QtCore.Qt.Horizontal)
-        hheader.setSectionResizeMode(QHeaderView.ResizeToContents)
-        self.sub_widget.tableWidget.setHorizontalHeader(hheader)
-        # parse x_label to String
-        xlabel = []
-        for i in range(df.columns.__len__()):
-            xlabel.append(str(df.columns.values[i]))
-        self.sub_widget.tableWidget.setHorizontalHeaderLabels(xlabel)
-
-        # Set Data
-        for i in range(df.shape[0]):
-            for j in range(df.shape[1]):
-                item = QTableWidgetItem(str(df.values[i][j]))
-                self.sub_widget.tableWidget.setItem(i, j, item)
-        self.sub_widget.show()
 
 
 if __name__ == "__main__":

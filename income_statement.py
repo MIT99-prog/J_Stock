@@ -1,14 +1,16 @@
 #
 import pandas as pd
 
-from error_handler import Error_Handler, Error
+from error_handler import Error_Handler, Error, ErrorList
 from serialize import Data
+from widget_helper import Result
 
 
 class Incomes:
     def __init__(self):
-        # self.incomes = []
+        self.e_list = ErrorList()
         self.incomes = dict()
+        self.result = Result()
 
     def __getitem__(self, i):
         keys = self.incomes.keys()
@@ -19,18 +21,16 @@ class Incomes:
         return self.incomes.__len__()
 
 
-class Incomes_Write(Incomes):
+class IncomesWrite(Incomes):
 
     def __init__(self):
         super().__init__()
 
-    def get_data(self, tickers) -> int:
+    def get_data(self, tickers) -> Result:
 
         for i in range(len(tickers.tickers)):
             try:
-                # elt = Income_Element(tickers.tickers[i].ticker, tickers.tickers[i].financials)
-                # self.incomes.append(elt)
-                # print(" i= " + str(i))
+
                 self.incomes[tickers.tickers[i].ticker] = tickers.tickers[i].financials
 
             except:
@@ -39,11 +39,18 @@ class Incomes_Write(Incomes):
                 erh.print_error()
 
         data = Data()  # Create Data class of serialize.py
-        data.save_data('income', self.incomes)  # Save data to stock file
-        return self.__len__()
+        self.result = data.save_data('income', self.incomes)  # Save data to stock file
+        if self.result.exec_continue:
+            self.result.action_name = 'Get Balance Sheet Data'
+            self.result.result_type = 'number'
+            self.result.result_data = self.__len__()
+            self.result.error_list = self.e_list
+        else:
+            pass
+        return self.result
 
 
-class Incomes_Read(Incomes):
+class IncomesRead(Incomes):
     def __init__(self, read_type):
         super().__init__()
 
@@ -55,23 +62,17 @@ class Incomes_Read(Incomes):
 
         self.data_read(read_type)
 
-    def data_read(self, read_type):
+    def data_read(self, read_type) -> Result:
         # Deserialize Income-statement data
         filename = "income"  # data file name
         data = Data()
+        self.result = data.load_data(filename)
+        if self.result.exec_continue:
+            self.incomes = self.result.result_data
+        else:
+            pass
 
-        self.incomes = data.load_data(filename)
-
-        # Create dictionary of income statement
-        # ie = Income_Element()
-        # for i in range(self.__len__()):
-        #     ie.company = self.__getitem__(i).company
-        #     ie.data = self.__getitem__(i).data
-        #     self.ie_dict[ie.company] = ie.data
-
-        # create index
-        # index = self.incomes[0].data.T.index
-        # index = self.__getitem__(0).data.T.index
+        # Extended Data Read
         if read_type == 'Extend':
             # initialize index
             income = pd.DataFrame()
@@ -102,28 +103,22 @@ class Incomes_Read(Incomes):
                 df_var = df.values[0][i].T['Net Income']
                 self.net_incomes.insert(loc=i, column=df.columns[i], value=df_var)
 
-
-            '''
-            for i in range(self.__len__()):
-                elt = self.__getitem__(i)
-
-                self.total_revenues.insert(loc=i, column=elt.company, value=elt.get_total_revenue(),
-                                       allow_duplicates=False)
-                self.operating_incomes.insert(loc=i, column=elt.company, value=elt.get_operating_income(),
-                                          allow_duplicates=False)
-                self.net_incomes.insert(loc=i, column=elt.company, value=elt.get_net_income(),
-                                    allow_duplicates=False)
-            '''
             # 欠損データの補完
             self.total_revenues = self.total_revenues.ffill()
             self.operating_incomes = self.operating_incomes.ffill()
             self.net_incomes = self.net_incomes.ffill()
 
-            print(" *** Total Revenue *** ")
-            print(self.total_revenues)
-            print(" *** Operating Income *** ")
-            print(self.operating_incomes)
-            print(" *** Net Income *** ")
-            print(self.net_incomes)
-            # return self.__len__()
+            # print(" *** Total Revenue *** ")
+            # print(self.total_revenues)
+            # print(" *** Operating Income *** ")
+            # print(self.operating_incomes)
+            # print(" *** Net Income *** ")
+            # print(self.net_incomes)
+        self.result.action_name = 'Read Income Statement Data'
+        self.result.result_type = 'number'
+        self.result.result_data = self.__len__()
+        self.result.error_list = self.e_list
+        if self.result.result_data == 0:
+            self.result.exec_continue = False
 
+        return self.result

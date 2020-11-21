@@ -1,23 +1,21 @@
 #
 import pandas as pd
-import yfinance as yf
 
 
 class Market:
     def __init__(self):
         self.company_list = pd.read_excel('data_j.xls')
         self.market_list = pd.DataFrame()
-        self.market_code = []
-        self.market_code_t = []
+        self.companies = []
+        # self.market_code_t = []
         self.tickers = object
-        print(self.company_list.head(10))
+        # print(self.company_list.head(10))
 
     def select_companies(self, market):
         # select company codes from company_list in Market
         self.market_list = self.company_list[self.company_list['市場・商品区分'].str.contains(market)]
         # select code
-        self.market_code = self.market_list['コード'].values
-
+        self.companies = self.market_list['コード'].values
 
 
 class Jasdaq(Market):
