@@ -4,6 +4,7 @@ from PyQt5 import uic
 from PyQt5 import QtCore
 import pandas as pd
 import matplotlib.pyplot as plt
+import mplfinance as mpf
 import numpy as np
 from errorhandler import ErrorHandler, ErrorList
 
@@ -82,6 +83,7 @@ class DispDataFrame(QWidget):
 
 class Graph:
     def __init__(self):
+        self.graph_type = ''
         self.title = ''
         self.x_label = []
         self.y_label = []
@@ -159,6 +161,36 @@ class GenerateGraph:
         plt.tight_layout()
         plt.show()
 
+    @staticmethod
+    def candle_graph(graph_object: Graph):
+        df = graph_object.data[0]
+        mpf.plot(df, type='candle', mav=(5, 25, 50), volume=True, figratio=(20, 10))
+
+    @staticmethod
+    def stacked_bar(graph_object: Graph):
+
+        labels = graph_object.data[0].index
+        legend = []
+        for i in range(graph_object.data.__len__()):
+            legend.append(graph_object.data[i])
+
+        width = 0.5  # the width of the bars: can also be len(x) sequence
+
+        fig, ax = plt.subplots()
+
+        ax.bar(labels, legend[0], width, label=graph_object.data_label[0])
+        for i in range(len(legend)):
+            if i == 0:
+                pass
+            else:
+                ax.bar(labels, legend[i], width, bottom=legend[i - 1], label=graph_object.data_label[i])
+
+        ax.set_ylabel(graph_object.y_label)
+        ax.set_title(graph_object.title)
+        ax.legend()
+
+        plt.show()
+
 
 class WidgetHelper:
     def __init__(self):
@@ -191,6 +223,12 @@ class WidgetHelper:
             elif r.result_type == 'bar graph':
                 gg = GenerateGraph()
                 gg.bar_graph(r.result_data)
+            elif r.result_type == 'candle graph':
+                gg = GenerateGraph()
+                gg.candle_graph(r.result_data)
+            elif r.result_type == 'stacked_bar graph':
+                gg = GenerateGraph()
+                gg.stacked_bar(r.result_data)
             else:
                 print('result_type is out of barns')
                 print('Type = ' + r.result_type)

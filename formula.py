@@ -37,7 +37,11 @@ class Formula:
         pass
 
 
-class CalcProfitRatio(metaclass=FormulaMeta):
+class CalcRatioPer(metaclass=FormulaMeta):
+    # ---------------------------------------------------
+    # operand_1 / operand_2 * 100
+    # answer is percentage %
+    # --------------------------------------------------
     def __init__(self, operand_1: pd.Series, operand_2: pd.Series):
         self.operand_1 = operand_1
         self.operand_2 = operand_2
@@ -122,6 +126,53 @@ class CalcProfitMean(metaclass=FormulaMeta):
     def post_process(self):
         self.result.result_type = 'pd.Series'
         self.result.result_data = pd.Series(self.answer, index=self.operand_1.columns)
+
+
+class CalcRatio(metaclass=FormulaMeta):
+    # ---------------------------------------------------
+    # operand_1 / operand_2
+    # answer is float
+    # --------------------------------------------------
+    def __init__(self, operand_1: pd.Series, operand_2: pd.Series):
+        self.operand_1 = operand_1
+        self.operand_2 = operand_2
+        self.answer = object
+        self.result = Result()
+        self.result.action_name = self.__str__()
+
+        if self.check_parameters():
+            try:
+                self.pre_process_1()
+                self.pre_process_2()
+                self.calculation()
+                self.post_process()
+            except ValueError:
+                er = Error(ValueError, self.__str__(), 'ValueError occurred!')
+                e_list = ErrorList().add_list(er)
+                self.result.error_list.add_list(e_list)
+                self.result.exec_continue = False
+
+    def check_parameters(self) -> bool:
+        if self.operand_1.index.equals(self.operand_2.index):
+            return True
+        else:
+            return False
+
+    def pre_process_1(self):
+        pass
+
+    def pre_process_2(self):
+        # for avoiding zero divide
+        # self.operand_2 = self.operand_2.where(self.operand_2.values > 0, 1)
+        pass
+
+    def calculation(self):
+        self.answer = self.operand_1 / self.operand_2 * 100
+
+    def post_process(self):
+        self.answer = self.answer.where(self.answer.values != np.inf, 0)
+        self.result.result_type = 'pd.Series'
+        self.result.result_data = self.answer
 
 
 if __name__ == '__main__':

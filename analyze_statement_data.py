@@ -3,8 +3,9 @@ import pandas as pd
 
 from collection import CollectionRead
 from errorhandler import Error, ErrorList
-from formula import CalcProfitRatio, CalcProfitMean
+from analysis_methods import AnalysisFinancials, AnalysisBalanceSheet, AnalysisHistory, AnalysisCashFlow
 from widget_helper import Result, Graph, DisplayInfo
+from formula import CalcProfitMean
 
 
 class AnalysisStatement:
@@ -47,7 +48,7 @@ class AnalysisStatement:
             elif di.data_type == 'financials':
                 statement = statement.financials
             elif di.data_type == 'history':
-                statement = statement.history()
+                statement = statement.history(period='1y')
             elif di.data_type == 'info':
                 statement = statement.info
             elif di.data_type == 'major_holders':
@@ -87,48 +88,29 @@ class AnalysisStatement:
         return result
 
     # class Graph:
-    def analysis_graph(self, di) -> Result:
+    def analysis_graph(self, di: DisplayInfo) -> Result:
         # initialize values
         result = Result()
         result.action_name = self.__str__()
-        result.result_type = 'line graph'
+        asd = object()
 
         # Get Income Statement from Collection
         statement = self.collection_read.collection.get(di.company + '.T')
         if self.collection_read.result.exec_continue is True:
+            if di.data_type == 'financials':
+                asd = AnalysisFinancials()
+            if di.data_type == 'balance_sheet':
+                asd = AnalysisBalanceSheet()
+            if di.data_type == 'history':
+                asd = AnalysisHistory()
+            if di.data_type == 'cashflow':
+                asd = AnalysisCashFlow()
 
-            # Calc Profit Ratio
-            cp = CalcProfitRatio(statement.T['Operating Income'], statement.T['Total Revenue'])
-            if cp.result.exec_continue:
-                profit_ratio_1 = cp.result.result_data
-            else:
-                profit_ratio_1 = None
-
-            cp = CalcProfitRatio(statement.T['Net Income'], statement.T['Total Revenue'])
-            if cp.result.exec_continue:
-                profit_ratio_2 = cp.result.result_data
-            else:
-                profit_ratio_2 = None
-
-            # generate Graph Class
-            g = Graph()
-            g.set_title('Profit Rate Graph')
-            # line 1
-            g.set_x_label('Date')
-            g.set_y_label('Profit Rate')
-            g.set_data_label('Operating Income')
-            if profit_ratio_1 is not None:
-                g.set_data(profit_ratio_1)
-            # line 2
-            g.set_x_label('Date')
-            g.set_y_label('Profit Rate')
-            g.set_data_label('Net Income')
-            if profit_ratio_2 is not None:
-                g.set_data(profit_ratio_2)
-
+            g = asd.get_graph_data(statement)
             result.result_data = g
+            result.result_type = g.graph_type
         else:
-            er = Error(ValueError, self.di.company, 'Hit No Statement Data')
+            er = Error(KeyError, di.company, 'Hit No Statement Data')
             e_list = ErrorList().add_list(er)
             result.error_list = e_list
 
@@ -173,11 +155,11 @@ class AnalysisStatement:
         g.set_data(average_pr['By Operating Income'])
 
         # Generate Result Class
-        self.result.action_name = 'generate Profitability ranking'
-        self.result.result_type = 'bar graph'
-        self.result.result_data = g
-        self.result.exec_continue = True
-        return self.result
+        result.action_name = 'generate Profitability ranking'
+        result.result_type = 'bar graph'
+        result.result_data = g
+        result.exec_continue = True
+        return result
 
 
 if __name__ == '__main__':

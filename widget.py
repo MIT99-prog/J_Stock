@@ -8,6 +8,7 @@ from dir_no_use.data_type import DataTypeDispatcher
 from market import Tosho1, Tosho2, Mothers, Jasdaq
 from widget_helper import Result, WidgetHelper, DisplayInfo
 from analyze_statement_data import AnalysisStatement
+from collection import CollectionWrite
 
 
 class FinancialAnalysis(QWidget):
@@ -46,7 +47,9 @@ class FinancialAnalysis(QWidget):
         # Get info from screen widget
         di = self.create_display_info()
 
-        self.result = self.dtd.write_data(di)
+        # Get Data by Market
+        cw = CollectionWrite(di)
+        self.result = cw.get_data()
 
         self.message.setText(self.data_type + "データが " + str(len(self.result.result_data)) + "件　取得できました！")
 
@@ -71,9 +74,15 @@ class FinancialAnalysis(QWidget):
     def on_analysis_graph(self):
         # Generate Display Information
         di = self.create_display_info()
-        self.result = self.dtd.exec_analysis_graph(di)
+        ast = AnalysisStatement(di.market, 'Base')
+        if ast.collection_read.result.exec_continue:
+            self.result = ast.analysis_graph(di)
+        else:
+            self.result = ast.collection_read.result
+        # Check the value of result
         wh = WidgetHelper()
         wh.parse_result(self.result)
+        print("Analysis Graph Button was clicked!")
 
     def on_rank(self):
         # Generate Display Information
