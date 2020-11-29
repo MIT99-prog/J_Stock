@@ -9,7 +9,7 @@ from widget_helper import Result, Graph, DisplayInfo
 
 class AnalysisBS:
     def __init__(self, di: DisplayInfo, read_type: str):
-        self.bs_collection = []
+        self.result = Result()
         self.di = di
         # Get Balance Sheet data
         self.bs_collection = BSesRead(di, read_type)
@@ -34,7 +34,7 @@ class AnalysisBS:
         return self.result
 
     # class Graph:
-    def ratio_graph(self, di):
+    def analysis_graph(self, di):
         bs = self.bs_collection.bses.get(di.company + '.T')
 
         # Calc Profit Ratio

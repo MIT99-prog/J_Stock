@@ -51,7 +51,8 @@ class BSesWrite(BSes):
 class BSesRead(BSes):
     def __init__(self, di: DisplayInfo, read_type: str):
         super().__init__()
-        self.filename = FileName(di.market, di.data_type)
+        self.filename = FileName()
+        self.filename.market = di.market
 
         # initialize values
         self.total_assets = pd.DataFrame()  # 資産
@@ -141,3 +142,11 @@ class BSesRead(BSes):
                 self.result.exec_continue = False
 
         return self.result
+
+if __name__ == '__main__':
+    di = DisplayInfo('mothers', 'info', [1401, 1431, 1436], '1401')
+    # cw = CollectionWrite(di)
+    # rslt = cw.get_data()
+    # cr = CollectionRead(di, 'Base')
+    cr = BSesRead(di, 'Extend')
+    print('end')

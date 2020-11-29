@@ -4,9 +4,10 @@ import sys
 from PyQt5 import uic
 from PyQt5.QtWidgets import QApplication, QWidget
 
-from data_type import DataTypeDispatcher
+from dir_no_use.data_type import DataTypeDispatcher
 from market import Tosho1, Tosho2, Mothers, Jasdaq
 from widget_helper import Result, WidgetHelper, DisplayInfo
+from analyze_statement_data import AnalysisStatement
 
 
 class FinancialAnalysis(QWidget):
@@ -47,15 +48,20 @@ class FinancialAnalysis(QWidget):
 
         self.result = self.dtd.write_data(di)
 
-        self.message.setText(self.data_type + "データが " + str(self.result.result_data) + "件　取得できました！")
+        self.message.setText(self.data_type + "データが " + str(len(self.result.result_data)) + "件　取得できました！")
 
         print("GetData process is completed!")
 
     def on_inquiry(self):
         # Generate Display Information
         di = self.create_display_info()
-        # Inquiry
-        self.result = self.dtd.exec_inquiry(di)
+        # Get inquiry data
+        ast = AnalysisStatement(di.market, 'Base')
+        if ast.collection_read.result.exec_continue:
+            self.result = ast.inquiry(di)
+        else:
+            self.result = ast.collection_read.result
+
         # Check the value of result
         wh = WidgetHelper()
         wh.parse_result(self.result)
@@ -113,19 +119,35 @@ class FinancialAnalysis(QWidget):
             return self.data_type
 
         elif self.pl.isChecked():  # Income Statement
-            self.data_type = 'income'
+            self.data_type = 'financials'
+            return self.data_type
+
+        elif self.qpl.isChecked():  # Quarterly Income Statement
+            self.data_type = 'quarterly_financials'
             return self.data_type
 
         elif self.bs.isChecked():  # Balance Sheet
-            self.data_type = 'balance'
+            self.data_type = 'balance_sheet'
+            return self.data_type
+
+        elif self.qbs.isChecked():  # Quarterly Balance Sheet
+            self.data_type = 'quarterly_balance_sheet'
             return self.data_type
 
         elif self.cf.isChecked():  # Cash Flow
-            self.data_type = 'cash'
+            self.data_type = 'cashflow'
+            return self.data_type
+
+        elif self.qcf.isChecked():  # Quarterly Cash Flow
+            self.data_type = 'quarterly_cashflow'
             return self.data_type
 
         elif self.stock.isChecked():  # Stock
-            self.data_type = 'stock'
+            self.data_type = 'history'
+            return self.data_type
+
+        elif self.holder.isChecked():  # Major Holders
+            self.data_type = 'major_holders'
             return self.data_type
 
     def create_display_info(self) -> DisplayInfo:

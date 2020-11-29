@@ -7,9 +7,9 @@ from widget_helper import Result, Graph, DisplayInfo
 
 class AnalysisStock:
     def __init__(self, di: DisplayInfo, read_type: str):
-        self.stock_collection = []
+        self.result = Result()
         self.di = di
-        # Get Stocks data
+        # Get Stock data
         self.stock_collection = StockRead(di, read_type)
         if self.stock_collection.result.exec_continue:
             print('Stock History Data (' + str(self.stock_collection.result.result_data) + ') set completed!')

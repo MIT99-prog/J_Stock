@@ -6,7 +6,7 @@ from serialize import Data, FileName
 from widget_helper import Result, DisplayInfo
 
 
-class Stocks:
+class Stock:
     def __init__(self):
 
         self.e_list = ErrorList()
@@ -22,7 +22,7 @@ class Stocks:
         return self.stocks.__len__()
 
 
-class StockWrite(Stocks):
+class StockWrite(Stock):
 
     def __init__(self, di: DisplayInfo):
         super().__init__()
@@ -55,7 +55,7 @@ class StockWrite(Stocks):
         return self.result
 
 
-class StockRead(Stocks):
+class StockRead(Stock):
     def __init__(self, di: DisplayInfo, read_type: str):
         super().__init__()
         self.di = di
@@ -72,7 +72,7 @@ class StockRead(Stocks):
 
         self.result = self.data_read()
 
-    def data_read(self):
+    def data_read(self) -> Result:
 
         data = Data()
         self.result = data.load_data(self.filename)

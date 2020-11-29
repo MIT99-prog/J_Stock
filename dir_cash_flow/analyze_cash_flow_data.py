@@ -24,7 +24,7 @@ class AnalysisCashFlow:
         print('Cash Flow Data set completed!')
 
     # class Inquiry:
-    def inquiry(self):
+    def inquiry(self) -> Result:
         self.result.action_name = 'Inquiry Cash Flow'
         self.result.result_type = 'dataframe'
         self.result.result_data = self.stm_collection.statements.get(self.di.company + '.T')
@@ -37,7 +37,7 @@ class AnalysisCashFlow:
         return self.result
 
     # class Graph:
-    def analysis_graph(self, company):
+    def analysis_graph(self, company) -> Result:
 
         self.result.action_name = 'analysis_graph of Cash Flow'
         self.result.result_type = 'line graph'

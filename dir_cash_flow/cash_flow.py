@@ -98,10 +98,10 @@ class StatementsRead(Statements):
                 # Total Revenues
                 df_var = df.values[0][i].T['Total Cashflows From Operating Activities']
                 self.total_cashflows_from_operating_activities.insert(loc=i, column=df.columns[i], value=df_var)
-                # Operating Incomes
+                # Operating Collection
                 df_var = df.values[0][i].T['Total Cashflows From Financing Activities']
                 self.total_cashflows_from_financing_activities.insert(loc=i, column=df.columns[i], value=df_var)
-                # Net Incomes
+                # Net Collection
                 df_var = df.values[0][i].T['Total Cashflows From Investing Activities']
                 self.total_cashflows_from_investing_activities.insert(loc=i, column=df.columns[i], value=df_var)
 

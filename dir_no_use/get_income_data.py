@@ -1,6 +1,6 @@
 #
 
-from dir_income_statement.income_statement import IncomesWrite
+from collection import CollectionWrite
 from market import Jasdaq
 
 if __name__ == '__main__':
@@ -8,5 +8,5 @@ if __name__ == '__main__':
     jasdaq = Jasdaq()
 
     # Get stock collection data and save stock file
-    iw = IncomesWrite()
+    iw = CollectionWrite()
     iw.get_incomes(jasdaq)

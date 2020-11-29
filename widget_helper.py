@@ -1,5 +1,5 @@
 #
-from PyQt5.QtWidgets import QWidget, QTableWidgetItem, QHeaderView
+from PyQt5.QtWidgets import QWidget, QTableWidgetItem, QHeaderView, QMessageBox
 from PyQt5 import uic
 from PyQt5 import QtCore
 import pandas as pd
@@ -29,6 +29,25 @@ class DispDataFrame(QWidget):
     def __init__(self):
         QWidget.__init__(self)
         self.sub_widget = uic.loadUi('table.ui', self)
+
+    def show_series(self, ss: pd.Series):
+        # sub_widget = Disp_DataFrame()
+        self.sub_widget.tableWidget.setRowCount(len(ss.values))
+        # Set Headers
+        vheader = QHeaderView(QtCore.Qt.Vertical)
+        vheader.setSectionResizeMode(QHeaderView.ResizeToContents)
+        self.sub_widget.tableWidget.setVerticalHeader(vheader)
+        # parse y_label to String
+        ylabel = []
+        for i in range(ss.index.__len__()):
+            ylabel.append(str(ss.index.values[i]))
+        self.sub_widget.tableWidget.setVerticalHeaderLabels(ylabel)
+        # Set Data
+        for i in range(ss.shape):
+            item = QTableWidgetItem(str(ss.values[i]))
+            self.sub_widget.tableWidget.setItem(i, item)
+        # Display Widget
+        self.sub_widget.show()
 
     def show_dataframe(self, df: pd.DataFrame):
         # sub_widget = Disp_DataFrame()
@@ -148,6 +167,19 @@ class WidgetHelper:
     @staticmethod
     def parse_result(r: Result):
         if r.exec_continue:
+            if r.result_type == 'strings':
+                QMessageBox(r.result_data)
+
+            if r.result_type == 'dictionary':
+                # Dict to DataFrame
+                df = pd.DataFrame(r.result_data.values(), index=r.result_data.keys())
+                ddf = DispDataFrame()
+                ddf.show_dataframe(df)
+
+            if r.result_type == 'series':
+                ddf = DispDataFrame()
+                ddf.show_series(r.result_data)
+
             if r.result_type == 'dataframe':
                 ddf = DispDataFrame()
                 ddf.show_dataframe(r.result_data)

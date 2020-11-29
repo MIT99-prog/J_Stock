@@ -6,9 +6,9 @@ import pandas as pd
 from errorhandler import Error, ErrorList
 from widget_helper import Result, DisplayInfo
 
-class Analysis_Info:
+class AnalysisInfo:
     def __init__(self, di: DisplayInfo, read_type: str):
-        self.info_collection = []
+        self.result = Result()
         self.di = di
         # Get Company Information data
         self.info_collection = InfosRead(di, read_type)
