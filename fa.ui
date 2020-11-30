@@ -49,10 +49,10 @@
   <widget class="QGroupBox" name="groupBox">
    <property name="geometry">
     <rect>
-     <x>40</x>
-     <y>120</y>
-     <width>451</width>
-     <height>171</height>
+     <x>20</x>
+     <y>100</y>
+     <width>541</width>
+     <height>201</height>
     </rect>
    </property>
    <property name="font">
@@ -68,12 +68,12 @@
      <rect>
       <x>30</x>
       <y>50</y>
-      <width>141</width>
+      <width>181</width>
       <height>17</height>
      </rect>
     </property>
     <property name="text">
-     <string>損益計算書データ</string>
+     <string>損益計算書データ／利益率</string>
     </property>
     <property name="checked">
      <bool>false</bool>
@@ -84,12 +84,12 @@
      <rect>
       <x>30</x>
       <y>80</y>
-      <width>171</width>
+      <width>321</width>
       <height>17</height>
      </rect>
     </property>
     <property name="text">
-     <string>貸借対照表データ</string>
+     <string>貸借対照表データ／自己資本比率、流動比率</string>
     </property>
    </widget>
    <widget class="QRadioButton" name="cf">
@@ -97,12 +97,12 @@
      <rect>
       <x>30</x>
       <y>110</y>
-      <width>171</width>
+      <width>261</width>
       <height>17</height>
      </rect>
     </property>
     <property name="text">
-     <string>キャッシュフローデータ</string>
+     <string>キャッシュフローデータ／営業、金融、投資</string>
     </property>
    </widget>
    <widget class="QRadioButton" name="info">
@@ -126,18 +126,18 @@
      <rect>
       <x>30</x>
       <y>140</y>
-      <width>141</width>
+      <width>261</width>
       <height>17</height>
      </rect>
     </property>
     <property name="text">
-     <string>株価データ</string>
+     <string>株価データ／日別値動き平均、分散指数</string>
     </property>
    </widget>
    <widget class="QRadioButton" name="qpl">
     <property name="geometry">
      <rect>
-      <x>250</x>
+      <x>340</x>
       <y>50</y>
       <width>171</width>
       <height>17</height>
@@ -150,7 +150,7 @@
    <widget class="QRadioButton" name="qbs">
     <property name="geometry">
      <rect>
-      <x>250</x>
+      <x>340</x>
       <y>80</y>
       <width>161</width>
       <height>17</height>
@@ -163,7 +163,7 @@
    <widget class="QRadioButton" name="qcf">
     <property name="geometry">
      <rect>
-      <x>250</x>
+      <x>340</x>
       <y>110</y>
       <width>181</width>
       <height>17</height>
@@ -176,7 +176,7 @@
    <widget class="QRadioButton" name="holder">
     <property name="geometry">
      <rect>
-      <x>250</x>
+      <x>340</x>
       <y>140</y>
       <width>171</width>
       <height>17</height>

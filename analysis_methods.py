@@ -70,7 +70,7 @@ class AnalysisBalanceSheet:
 
         # Generate Graph
         g = Graph()
-        g.graph_type = 'line graph'
+        g.graph_type = 'multi_line graph'
         g.set_title('Capital Adequacy & Current Ratio Graph')
         # line 1
         g.set_x_label('Date')
