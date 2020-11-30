@@ -131,7 +131,7 @@
      </rect>
     </property>
     <property name="text">
-     <string>株価データ／日別値動き平均、分散指数</string>
+     <string>株価データ／ローソク足、移動平均、出来高</string>
     </property>
    </widget>
    <widget class="QRadioButton" name="qpl">
