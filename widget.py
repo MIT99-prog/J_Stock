@@ -4,11 +4,10 @@ import sys
 from PyQt5 import uic
 from PyQt5.QtWidgets import QApplication, QWidget
 
-from dir_no_use.data_type import DataTypeDispatcher
+from analyze_statement_data import AnalysisStatement, AnalysisCrossData
+from collection import CollectionWrite, ConfigDataWrite
 from market import Tosho1, Tosho2, Mothers, Jasdaq
 from widget_helper import Result, WidgetHelper, DisplayInfo
-from analyze_statement_data import AnalysisStatement
-from collection import CollectionWrite
 
 
 class FinancialAnalysis(QWidget):
@@ -16,7 +15,7 @@ class FinancialAnalysis(QWidget):
         QWidget.__init__(self)
         # Set initial data for the widget
         # Data Type (Information / Income Statement / Balance Sheet / Cash Flow / Stock)
-        self.dtd = DataTypeDispatcher()
+        # self.dtd = DataTypeDispatcher()
         self.market = ''
         self.data_type = ''
 
@@ -34,6 +33,7 @@ class FinancialAnalysis(QWidget):
 
         # sign connect to slot
         self.getData.clicked.connect(self.on_get_data)
+        self.configData.clicked.connect(self.on_config_data)
         self.inquiry.clicked.connect(self.on_inquiry)
         self.rank.clicked.connect(self.on_rank)
         self.wmarket.activated.connect(self.create_companies)
@@ -55,11 +55,16 @@ class FinancialAnalysis(QWidget):
 
         print("GetData process is completed!")
 
+    def on_config_data(self):
+        # Get info from screen widget
+        di = self.create_display_info()
+        ConfigDataWrite(di.market)
+
     def on_inquiry(self):
         # Generate Display Information
         di = self.create_display_info()
         # Get inquiry data
-        ast = AnalysisStatement(di.market, 'Base')
+        ast = AnalysisStatement(di.market)
         if ast.collection_read.result.exec_continue:
             self.result = ast.inquiry(di)
         else:
@@ -74,7 +79,7 @@ class FinancialAnalysis(QWidget):
     def on_analysis_graph(self):
         # Generate Display Information
         di = self.create_display_info()
-        ast = AnalysisStatement(di.market, 'Base')
+        ast = AnalysisStatement(di.market)
         if ast.collection_read.result.exec_continue:
             self.result = ast.analysis_graph(di)
         else:
@@ -87,7 +92,11 @@ class FinancialAnalysis(QWidget):
     def on_rank(self):
         # Generate Display Information
         di = self.create_display_info()
-        self.result = self.dtd.exec_ranking(di)
+        ast = AnalysisCrossData(di.market)
+        if ast.collection_read.result.exec_continue:
+            self.result = ast.generate_ranking(di)
+        else:
+            self.result = ast.collection_read.result
         wh = WidgetHelper()
         wh.parse_result(self.result)
 

@@ -8,9 +8,10 @@ from widget_helper import Result
 class FileName:
     def __init__(self):
         self.market = ''
+        self.data_type = ''
 
     def get_file_name(self) -> str:
-        return './tickers_' + self.market
+        return './' + self.data_type + '_' + self.market
 
 
 class Data:

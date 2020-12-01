@@ -87,6 +87,43 @@ class AnalysisBalanceSheet:
 
         return g
 
+    @staticmethod
+    def get_rank_data(collection: pd.DataFrame) -> Graph:
+        # get data from collection
+        total_stockholder_equity = collection.T['Total Stockholder Equity']
+        total_assets = collection.T['Total Assets']
+        total_current_assets = collection.T['Total Current Assets']
+        total_current_liabilities = collection.T['Total Current Liabilities']
+
+        # Calc Capital Adequacy Ratio & Current Ratio
+        average_pr1 = CalcRatioPer(total_stockholder_equity, total_assets)
+        average_pr2 = CalcRatioPer(total_current_assets, total_current_liabilities)
+        # average_pr = pd.DataFrame()
+        # average_pr.insert(0, 'Capital Adequacy Ratio', average_pr1.result.result_data)
+        # average_pr.insert(1, 'Current Ratio', average_pr2.result.result_data)
+        average_1 = pd.Series.sort_values(average_pr1.result.result_data, ascending=False)
+        average_1 = average_1.head(10)
+        average_2 = pd.Series.sort_values(average_pr2.result.result_data, ascending=False)
+        average_2 = average_2.head(10)
+
+        # generate Graph Object
+        g = Graph()
+        g.graph_type = 'multi_line graph'
+        g.set_title('Capital Adequacy Ratio Ranking Graph (Top10)')
+        # bar1
+        g.set_x_label('Company')
+        g.set_y_label('Average %')
+        g.set_data_label('Capital Adequacy Ratio')
+        g.set_data(average_1)
+        # bar2
+        g.set_x_label('Company')
+        g.set_y_label('Average %')
+        g.set_data_label('Current Ratio')
+        g.set_data(average_2)
+
+        print(g)
+        return g
+
 
 class AnalysisHistory:
     def __init__(self):
@@ -115,6 +152,7 @@ class AnalysisHistory:
             g.set_data(df)
 
         return g
+
 
 class AnalysisCashFlow:
     def __init__(self):

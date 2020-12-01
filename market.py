@@ -16,7 +16,8 @@ class Market:
         self.market_list = self.company_list[self.company_list['市場・商品区分'].str.contains(market)]
         # select code
         self.companies = self.market_list['コード'].values
-
+        # omit 5 digits code
+        self.companies = self.companies[self.companies < 10000]
 
 class Jasdaq(Market):
     def __init__(self):

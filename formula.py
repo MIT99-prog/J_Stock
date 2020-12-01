@@ -84,7 +84,7 @@ class CalcRatioPer(metaclass=FormulaMeta):
         self.result.result_data = self.answer
 
 
-class CalcProfitMean(metaclass=FormulaMeta):
+class CalcRatioMean(metaclass=FormulaMeta):
     def __init__(self, operand_1: pd.DataFrame, operand_2: pd.DataFrame):
         self.operand_1 = operand_1
         self.operand_2 = operand_2
@@ -178,5 +178,5 @@ class CalcRatio(metaclass=FormulaMeta):
 if __name__ == '__main__':
     op1 = pd.DataFrame([[0, 1], [1.1, 2.5], [2, 2.3], [2.5, 3]], columns=['A', 'B'])
     op2 = pd.DataFrame([[1.2, 1], [0, 3.1], [5.2, 5.5], [6, 8.1]], columns=['A', 'B'])
-    cp = CalcProfitMean(op1, op2)
+    cp = CalcRatioMean(op1, op2)
     print('end')

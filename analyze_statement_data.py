@@ -1,18 +1,18 @@
 #
 import pandas as pd
 
-from collection import CollectionRead
+from collection import CollectionRead, ConfigDataRead
 from errorhandler import Error, ErrorList
 from analysis_methods import AnalysisFinancials, AnalysisBalanceSheet, AnalysisHistory, AnalysisCashFlow
 from widget_helper import Result, Graph, DisplayInfo
-from formula import CalcProfitMean
+from formula import CalcRatioPer
 
 
 class AnalysisStatement:
-    def __init__(self, market: str, read_type: str):
+    def __init__(self, market: str):
 
         # Get Collection data
-        self.collection_read = CollectionRead(market, read_type)
+        self.collection_read = CollectionRead(market)
 
         if self.collection_read.result.exec_continue and self.collection_read.collection is not None:
             collection_number = str(len(self.collection_read.collection))
@@ -116,47 +116,37 @@ class AnalysisStatement:
 
         return result
 
-    def generate_ranking(self) -> Result:
+
+class AnalysisCrossData:
+    def __init__(self, market):
+        # Get Collection data
+        self.collection_read = ConfigDataRead(market)
+
+        if self.collection_read.result.exec_continue and self.collection_read.collection_list is not None:
+            collection_number = str(len(self.collection_read.collection_list))
+            print('Get ' + market + ' Collection Data (' + collection_number + ') Statements!')
+            pass
+        else:
+            print('Get ' + market + ' Collection Data error!')
+
+        print('Complete Collection Data Process!')
+
+    def generate_ranking(self, di: DisplayInfo) -> Result:
+        # initialize values
         result = Result()
         result.action_name = self.__str__()
-        result.result_type = 'line graph'
-        # Calc Profit Ratio
-        '''
-        profit_ratios_1 = self.collection.operating_incomes / \
-                          self.collection.total_revenues * 100  # Operating Income
-        profit_ratios_2 = self.collection.net_incomes / \
-                          self.collection.total_revenues * 100  # Net Income
+        result.result_type = 'bar graph'
 
-        average_pr1 = profit_ratios_1.mean(numeric_only=True)
-        average_pr2 = profit_ratios_2.mean(numeric_only=True)
-        '''
-        average_pr1 = CalcProfitMean(self.collection_read.collection.operating_incomes,
-                                     self.collection_read.collection.total_revenues)
-        average_pr2 = CalcProfitMean(self.collection_read.collection.net_incomes,
-                                     self.collection_read.collection.total_revenues)
-        average_pr = pd.DataFrame()
-        average_pr.insert(0, 'By Net Income', average_pr2)
-        average_pr.insert(1, 'By Operating Income', average_pr1)
-        average_pr = average_pr.sort_values('By Net Income', ascending=False)
-        average_pr = average_pr.head(10)
-
-        # generate Graph Object
-        g = Graph()
-        g.set_title('Profit Ratio Ranking Graph (Top10)')
-        # bar1
-        g.set_x_label('Company')
-        g.set_y_label('Average %')
-        g.set_data_label('Calc by Net Income')
-        g.set_data(average_pr['By Net Income'])
-        # bar2
-        g.set_x_label('Company')
-        g.set_y_label('Average %')
-        g.set_data_label('Calc by Operating Income')
-        g.set_data(average_pr['By Operating Income'])
+        # get collection data
+        collection_list = self.collection_read.collection_list
+        # BS Ranking
+        collection_balance_sheet = collection_list.get('balance_sheet')
+        asd = AnalysisBalanceSheet()
+        g = asd.get_rank_data(collection_balance_sheet)
 
         # Generate Result Class
         result.action_name = 'generate Profitability ranking'
-        result.result_type = 'bar graph'
+        result.result_type = g.graph_type
         result.result_data = g
         result.exec_continue = True
         return result
