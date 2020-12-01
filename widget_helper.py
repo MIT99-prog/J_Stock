@@ -184,6 +184,28 @@ class GenerateGraph:
         plt.show()
 
     @staticmethod
+    def multi_bar_graph(graph_object: Graph):
+        # initialize values
+        number_graph = graph_object.data.__len__()
+        x = list()
+        y = list()
+        # set graph data
+        fig, ax = plt.subplots(1, number_graph, figsize=(12, number_graph))
+        # ax.set_title(graph_object.title)
+        for i in range(number_graph):
+            # Generate Graph
+            ax[i].set_xlabel(graph_object.x_label[i])
+            ax[i].set_ylabel(graph_object.y_label[i])
+            x.insert(i, graph_object.data[i].index)
+            y.insert(i, graph_object.data[i].values)
+            ax[i].bar(x[i], y[i], label=graph_object.data_label[i])
+            ax[i].legend()
+        fig.suptitle(graph_object.title)
+        # Display Graph
+        plt.tight_layout()
+        plt.show()
+
+    @staticmethod
     def candle_graph(graph_object: Graph):
         df = graph_object.data[0]
         mpf.plot(df, type='candle', mav=(5, 25, 50), volume=True, figratio=(20, 10))
@@ -249,6 +271,10 @@ class WidgetHelper:
             elif r.result_type == 'bar graph':
                 gg = GenerateGraph()
                 gg.bar_graph(r.result_data)
+
+            elif r.result_type == 'multi_bar graph':
+                gg = GenerateGraph()
+                gg.multi_bar_graph(r.result_data)
 
             elif r.result_type == 'candle graph':
                 gg = GenerateGraph()

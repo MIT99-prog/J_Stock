@@ -108,7 +108,7 @@ class AnalysisBalanceSheet:
 
         # generate Graph Object
         g = Graph()
-        g.graph_type = 'multi_line graph'
+        g.graph_type = 'multi_bar graph'
         g.set_title('Capital Adequacy Ratio Ranking Graph (Top10)')
         # bar1
         g.set_x_label('Company')
