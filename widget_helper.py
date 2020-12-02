@@ -138,7 +138,7 @@ class GenerateGraph:
         x = list()
         y = list()
         # set graph data
-        fig, ax = plt.subplots(1, number_graph, figsize=(12, number_graph))
+        fig, ax = plt.subplots(number_graph, 1, figsize=(10, 10))
         # ax.set_title(graph_object.title)
         for i in range(number_graph):
             # Generate Graph
@@ -190,7 +190,7 @@ class GenerateGraph:
         x = list()
         y = list()
         # set graph data
-        fig, ax = plt.subplots(1, number_graph, figsize=(12, number_graph))
+        fig, ax = plt.subplots(number_graph, 1, figsize=(10, 10))
         # ax.set_title(graph_object.title)
         for i in range(number_graph):
             # Generate Graph

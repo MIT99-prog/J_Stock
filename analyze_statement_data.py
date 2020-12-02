@@ -139,10 +139,18 @@ class AnalysisCrossData:
 
         # get collection data
         collection_list = self.collection_read.collection_list
-        # BS Ranking
-        collection_balance_sheet = collection_list.get('balance_sheet')
-        asd = AnalysisBalanceSheet()
-        g = asd.get_rank_data(collection_balance_sheet)
+        if di.data_type == 'balance_sheet':
+            # BS Ranking
+            collection_balance_sheet = collection_list.get('balance_sheet')
+            asd = AnalysisBalanceSheet()
+            g = asd.get_rank_data(collection_balance_sheet)
+        elif di.data_type == 'history':
+            # Stock Ranking
+            collection_history = collection_list.get('history')
+            asd = AnalysisHistory()
+            g = asd.get_rank_data(collection_history)
+        else:
+            result.exec_continue = False
 
         # Generate Result Class
         result.action_name = 'generate Profitability ranking'

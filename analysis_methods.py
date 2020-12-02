@@ -1,7 +1,7 @@
 #
 import pandas as pd
 
-from formula import CalcRatioPer
+from formula import CalcRatioPer, CalcBalance
 from widget_helper import Graph
 
 
@@ -98,13 +98,10 @@ class AnalysisBalanceSheet:
         # Calc Capital Adequacy Ratio & Current Ratio
         average_pr1 = CalcRatioPer(total_stockholder_equity, total_assets)
         average_pr2 = CalcRatioPer(total_current_assets, total_current_liabilities)
-        # average_pr = pd.DataFrame()
-        # average_pr.insert(0, 'Capital Adequacy Ratio', average_pr1.result.result_data)
-        # average_pr.insert(1, 'Current Ratio', average_pr2.result.result_data)
         average_1 = pd.Series.sort_values(average_pr1.result.result_data, ascending=False)
-        average_1 = average_1.head(10)
+        average_1 = average_1.head(15)
         average_2 = pd.Series.sort_values(average_pr2.result.result_data, ascending=False)
-        average_2 = average_2.head(10)
+        average_2 = average_2.head(15)
 
         # generate Graph Object
         g = Graph()
@@ -151,6 +148,40 @@ class AnalysisHistory:
         if statement is not None:
             g.set_data(df)
 
+        return g
+
+    @staticmethod
+    def get_rank_data(collection: pd.DataFrame) -> Graph:
+        # get data from collection
+        open_price = collection.T['Open']
+        close_price = collection.T['Close']
+        volume = collection.T['Volume']
+
+        # Calc Capital Adequacy Ratio & Current Ratio
+        balance = CalcBalance(open_price, close_price)
+        calc_data = pd.DataFrame()
+        calc_data.insert(0, 'Balance', balance.result.result_data)
+        calc_data.insert(1, 'Volume', volume)
+        calc_data = calc_data.sort_values('Balance', ascending=False)
+        calc_data = calc_data.head(15)
+
+
+        # generate Graph Object
+        g = Graph()
+        g.graph_type = 'multi_bar graph'
+        g.set_title('Price Change Average Ranking Graph (Top10)')
+        # bar1
+        g.set_x_label('Company')
+        g.set_y_label('Currency')
+        g.set_data_label('Balance')
+        g.set_data(calc_data['Balance'])
+        # bar2
+        g.set_x_label('Company')
+        g.set_y_label('unit')
+        g.set_data_label('Volume')
+        g.set_data(calc_data['Volume'])
+
+        # print(g)
         return g
 
 

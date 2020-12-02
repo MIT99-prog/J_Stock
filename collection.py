@@ -358,7 +358,7 @@ class ConfigDataWrite:
                 e_list.add_list(er)
                 collection_financials.insert(i, k, None)
             try:
-                collection_history.insert(i, k, v.history(period='1y').mean(1))
+                collection_history.insert(i, k, v.history(period='1mo').mean(0))
             except KeyError:
                 er = Error(KeyError, 'get_rank_data / history', k)
                 e_list.add_list(er)
