@@ -81,7 +81,8 @@ class AnalysisStatement:
 
         except KeyError:
             er = Error(KeyError, di.company, 'Hit No Data')
-            e_list = ErrorList().add_list(er)
+            e_list = ErrorList()
+            e_list.add_list(er)
             result.error_list = e_list
             result.exec_continue = False
 
@@ -111,7 +112,8 @@ class AnalysisStatement:
             result.result_type = g.graph_type
         else:
             er = Error(KeyError, di.company, 'Hit No Statement Data')
-            e_list = ErrorList().add_list(er)
+            e_list = ErrorList()
+            e_list.add_list(er)
             result.error_list = e_list
 
         return result
@@ -135,7 +137,7 @@ class AnalysisCrossData:
         # initialize values
         result = Result()
         result.action_name = self.__str__()
-        result.result_type = 'bar graph'
+        result.exec_continue = True
 
         # get collection data
         collection_list = self.collection_read.collection_list
@@ -144,24 +146,32 @@ class AnalysisCrossData:
             collection = collection_list.get('balance_sheet')
             asd = AnalysisBalanceSheet()
             g = asd.get_rank_data(collection)
+            # Generate Result Class
+            result.result_type = g.graph_type
+            result.result_data = g
         elif di.data_type == 'history':
             # Stock Ranking
             collection = collection_list.get('history')
             asd = AnalysisHistory()
             g = asd.get_rank_data(collection)
+            # Generate Result Class
+            result.result_type = g.graph_type
+            result.result_data = g
         elif di.data_type == 'financials':
             # Stock Ranking
             collection = collection_list.get('financials')
             asd = AnalysisFinancials()
             g = asd.get_rank_data(collection)
+            # Generate Result Class
+            result.result_type = g.graph_type
+            result.result_data = g
         else:
+            er = Error(self, 'Function Error', 'Ranking for ' + di.data_type + ' does not exist!')
+            e_list = ErrorList()
+            e_list.add_list(er)
+            result.error_list = e_list
             result.exec_continue = False
 
-        # Generate Result Class
-        result.action_name = 'generate Profitability ranking'
-        result.result_type = g.graph_type
-        result.result_data = g
-        result.exec_continue = True
         return result
 
 

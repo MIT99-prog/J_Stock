@@ -77,8 +77,8 @@ class CalcRatioPer(metaclass=FormulaMeta):
 
     def pre_process_2(self):
         # for avoiding zero divide
-        self.operand_2 = self.operand_2.where(self.operand_2.values != None, -999999999999)
-        self.operand_2 = self.operand_2.where(self.operand_2.values != 0, -999999999999)
+        self.operand_2 = self.operand_2.where(self.operand_2.values != None, -999999999999999)
+        self.operand_2 = self.operand_2.where(self.operand_2.values != 0, -999999999999999)
         pass
 
     def calculation(self):
