@@ -60,6 +60,11 @@ class CalcRatioPer(metaclass=FormulaMeta):
                 e_list = ErrorList().add_list(er)
                 self.result.error_list.add_list(e_list)
                 self.result.exec_continue = False
+            except ZeroDivisionError:
+                er = Error(ZeroDivisionError, self.__str__(), 'ZeroDivisionError occurred!')
+                e_list = ErrorList().add_list(er)
+                self.result.error_list.add_list(e_list)
+                self.result.exec_continue = True
 
     def check_parameters(self) -> bool:
         if self.operand_1.index.equals(self.operand_2.index):
@@ -72,7 +77,8 @@ class CalcRatioPer(metaclass=FormulaMeta):
 
     def pre_process_2(self):
         # for avoiding zero divide
-        # self.operand_2 = self.operand_2.where(self.operand_2.values > 0, 1)
+        self.operand_2 = self.operand_2.where(self.operand_2.values != None, -999999999999)
+        self.operand_2 = self.operand_2.where(self.operand_2.values != 0, -999999999999)
         pass
 
     def calculation(self):

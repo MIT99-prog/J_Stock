@@ -46,6 +46,40 @@ class AnalysisFinancials:
 
         return g
 
+    @staticmethod
+    def get_rank_data(collection: pd.DataFrame) -> Graph:
+        # get data from collection
+        total_revenue = collection.T['Total Revenue']
+        operating_income = collection.T['Operating Income']
+        net_income = collection.T['Net Income']
+
+
+        # Calc Capital Adequacy Ratio & Current Ratio
+        average_pr1 = CalcRatioPer(operating_income, total_revenue)
+        average_pr2 = CalcRatioPer(net_income, total_revenue)
+        average_1 = pd.Series.sort_values(average_pr1.result.result_data, ascending=False)
+        average_1 = average_1.head(15)
+        average_2 = pd.Series.sort_values(average_pr2.result.result_data, ascending=False)
+        average_2 = average_2.head(15)
+
+        # generate Graph Object
+        g = Graph()
+        g.graph_type = 'multi_bar graph'
+        g.set_title('Profit Ratio Ranking Graph (Top15)')
+        # bar1
+        g.set_x_label('Company')
+        g.set_y_label('Average %')
+        g.set_data_label('By Operating Income')
+        g.set_data(average_1)
+        # bar2
+        g.set_x_label('Company')
+        g.set_y_label('Average %')
+        g.set_data_label('By Net Income')
+        g.set_data(average_2)
+
+        # print(g)
+        return g
+
 
 class AnalysisBalanceSheet:
     def __init__(self):
@@ -118,7 +152,7 @@ class AnalysisBalanceSheet:
         g.set_data_label('Current Ratio')
         g.set_data(average_2)
 
-        print(g)
+        # print(g)
         return g
 
 
